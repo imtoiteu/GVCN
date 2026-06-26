@@ -160,6 +160,41 @@ export const t = {
       `Lưu ý: văn bản có chứa từ ngữ nên tránh (${phrases}). Hãy chỉnh lại cho nhẹ nhàng, mang tính hỗ trợ.`,
     savedOk: 'Đã lưu văn bản cho lớp này.',
   },
+
+  exportsPage: {
+    title: 'Xuất file (DOCX / PDF / XLSX)',
+    intro:
+      'Chọn lớp, loại văn bản và tuần/tháng để xem trước, sau đó tải xuống bản DOCX, XLSX hoặc in/lưu PDF. Tệp được tạo cục bộ trên máy, không gửi ra ngoài và chỉ dùng dữ liệu đã ghi nhận.',
+    classLabel: 'Lớp:',
+    artifactLabel: 'Loại văn bản:',
+    weekLabel: 'Tuần:',
+    monthLabel: 'Tháng:',
+    timeLabel: 'Thời gian họp (tùy chọn):',
+    timePlaceholder: 'VD: 15h00 ngày 06/09/2025',
+    artMinutes: 'Biên bản họp lớp (tuần)',
+    artWeekly: 'Báo cáo tuần',
+    artMonthly: 'Báo cáo tháng',
+    artComments: 'Danh sách nhận xét học sinh',
+    artParentMessages: 'Danh sách tin nhắn phụ huynh',
+    previewTitle: 'Xem trước nội dung sẽ xuất',
+    downloadDocx: 'Tải DOCX',
+    downloadXlsx: 'Tải XLSX',
+    printPdf: 'In / Lưu PDF',
+    exporting: 'Đang xuất…',
+    docxOnly: '* Nhận xét/tin nhắn xuất DOCX và XLSX; in/lưu PDF qua trình duyệt.',
+    listFromSaved:
+      'Danh sách lấy từ các nhận xét/tin nhắn bạn đã lưu ở những màn hình tương ứng.',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Hãy sang màn hình “Ghi nhận tuần” để tạo tuần và ghi nhận quan sát trước.',
+    noMonthTitle: 'Chưa nhóm được tháng nào',
+    noMonthHint: 'Các tuần cần có ngày bắt đầu để nhóm theo tháng. Hãy tạo tuần ở màn hình “Ghi nhận tuần”.',
+    emptyListTitle: 'Chưa có nội dung để xuất',
+    emptyListHint:
+      'Tuần này chưa có nhận xét/tin nhắn nào được lưu. Hãy tạo và lưu ở màn hình tương ứng trước, rồi quay lại đây để xuất.',
+    exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
+  },
 } as const;
 
 /** Which report artifact the "Biên bản & Báo cáo" screen is producing. */
@@ -205,6 +240,30 @@ export function toneLabel(tone: 'short' | 'balanced' | 'encouraging'): string {
       return t.comments.toneEncouraging;
     default:
       return t.comments.toneBalanced;
+  }
+}
+
+/** Which artifact the "Xuất file" screen exports. Mirrors ExportArtifactType in lib/export. */
+export type ExportArtifactChoice =
+  | 'minutes'
+  | 'weeklyReport'
+  | 'monthlyReport'
+  | 'comments'
+  | 'parentMessages';
+
+/** Vietnamese label for an export-artifact choice. */
+export function exportArtifactLabel(choice: ExportArtifactChoice): string {
+  switch (choice) {
+    case 'minutes':
+      return t.exportsPage.artMinutes;
+    case 'weeklyReport':
+      return t.exportsPage.artWeekly;
+    case 'monthlyReport':
+      return t.exportsPage.artMonthly;
+    case 'comments':
+      return t.exportsPage.artComments;
+    case 'parentMessages':
+      return t.exportsPage.artParentMessages;
   }
 }
 

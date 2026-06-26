@@ -12,6 +12,7 @@ import { WeeklyRecordPage } from '../features/weekly/WeeklyRecordPage';
 import { CommentsPage } from '../features/comments/CommentsPage';
 import { ParentMessagesPage } from '../features/parent/ParentMessagesPage';
 import { ReportsPage } from '../features/reports/ReportsPage';
+import { ExportsPage } from '../features/exports/ExportsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 export interface NavItem {
@@ -30,7 +31,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'parent', label: 'Tin nhắn phụ huynh', render: () => <ParentMessagesPage /> },
   { id: 'minutes', label: 'Biên bản họp lớp', render: () => <ReportsPage initialKind="minutes" /> },
   { id: 'reports', label: 'Báo cáo tuần/tháng', render: () => <ReportsPage initialKind="weekly" /> },
-  { id: 'exports', label: 'Xuất DOCX/PDF/XLSX', render: () => <PlaceholderPage title="Xuất DOCX/PDF/XLSX" /> },
+  { id: 'exports', label: 'Xuất DOCX/PDF/XLSX', render: () => <ExportsPage /> },
   { id: 'claude', label: 'Claude Export', render: () => <PlaceholderPage title="Claude Export" /> },
   { id: 'settings', label: 'Cài đặt', render: () => <PlaceholderPage title="Cài đặt" /> },
 ];

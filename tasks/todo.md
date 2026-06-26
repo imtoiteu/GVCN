@@ -74,17 +74,18 @@
   - **Logic + UI done (M6 session):** M4 comments, M5 parent messages, M6 minutes + weekly/monthly reports all generate respectful, editable Vietnamese text; every generator self-checks its controlled output against the shared M4 banned-phrase guard, and tone is enforced by tests. **Remaining:** a single runtime GUI run on a machine with a display across the four generator screens.
 
 ## M7 — Exports: DOCX / PDF / XLSX
-- [ ] Define generator→export **view-model contract** (before/at start of M7)
-  - Verify: typed contract documented.
-- [ ] DOCX via docxtemplater + generic template in `templates/` (Risk #5)
-  - Verify: opens in Word, diacritics intact.
-- [ ] PDF via print-friendly route (webview Save-as-PDF)
-  - Verify: PDF opens, layout/diacritics OK.
-- [ ] XLSX via SheetJS (roster/records/report)
-  - Verify: opens in Excel; round-trips with M2.
-- [ ] **TDD** view-model + mapper structure tests
-  - Verify: tests green.
+- [x] Define generator→export **view-model contract** (before/at start of M7)
+  - **Done (M7 session).** `src/lib/export/exportModel.ts`: normalized `ExportModel` (artifactType, title, meta, blocks, table, filenameBase) + pure builders `buildReportModel`/`buildListModel`/`reportSummaryTable`/`asciiSlug`. Builders **map already-generated, guard-checked text** (no regeneration). Documented in `docs/m7-exports.md`. Verify: typed contract + tests green ✅.
+- [x] ~~DOCX via docxtemplater~~ **DOCX via hand-rolled minimal OOXML + store-only ZIP writer (Risk #5)**
+  - **Done (M7 session) — and changed the choice (zero new deps).** `src/lib/export/{docx,zip}.ts`: minimal valid `.docx` (3 OOXML parts) packed by a deterministic store-only ZIP writer + CRC-32. Verified with `unzip -t` (every CRC OK) + diacritics intact in `word/document.xml`. `docxtemplater`+`pizzip`/`templates/` deferred as the templating upgrade path. Verify: `unzip -t` clean; **open-in-Word** is the headless-VPS manual step. See `docs/m7-exports.md`.
+- [x] PDF via print-friendly route (webview Save-as-PDF)
+  - **Done (M7 session).** `src/lib/export/printHtml.ts` builds a self-contained UTF-8 print page (auto-opens the print dialog); `download.ts#openPrintHtml` opens it in a new window → "Save as PDF". No PDF engine bundled (`pdfmake` = documented fallback). Verify: HTML structure tested; **PDF open/layout** is the headless-VPS manual step.
+- [x] ~~XLSX via SheetJS~~ **XLSX via ExcelJS** (comment/message lists + report summary rows)
+  - **Done (M7 session).** `src/lib/export/xlsx.ts` reuses **ExcelJS** (no new dep). Bold title/header rows + data; `unzip -t` clean and **round-tripped back through ExcelJS** in tests to confirm cell content. Verify: tests green ✅; opens-in-Excel is the manual step.
+- [x] **TDD** view-model + mapper structure tests
+  - **Done (M7 session).** `+25` tests across `src/lib/export/__tests__/` (exportModel, zip+CRC vectors, docx XML+bytes, xlsx round-trip, printHtml). Verify: `npm run test` → **100 passed**; typecheck/build 0; `cargo check` Finished; `npm audit` 0. **"Xuất file" screen** (`src/features/exports/ExportsPage.tsx`) wired into the `exports` nav slot: class → artifact → week/month → preview → download DOCX/XLSX or In/Lưu PDF; empty/no-saved states are safe. **Runtime GUI smoke-check** (download + print wiring) pending a display. See `docs/m7-exports.md`.
 - [ ] **Checkpoint E (with M8):** all output paths work.
+  - **File paths DONE (M7):** DOCX/XLSX/PDF export wired + tested; Claude Export (M8) is the remaining output path.
 
 ## M8 — Claude Export (anonymized) (TDD)
 - [ ] `lib/export/anonymize.ts` (single boundary) + Claude Export screen → clipboard

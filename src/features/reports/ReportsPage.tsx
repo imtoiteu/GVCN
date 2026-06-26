@@ -32,7 +32,7 @@ import { reportKindLabel, t, type ReportKind } from '../../app/i18n';
 
 type Status = 'loading' | 'error' | 'ready';
 
-interface MonthGroup {
+export interface MonthGroup {
   key: string; // 'YYYY-MM' or 'other'
   label: string;
   weeks: WeekRow[];
@@ -47,7 +47,7 @@ interface ReportTarget {
 const KIND_CHOICES: ReportKind[] = ['minutes', 'weekly', 'monthly'];
 
 /** Human label for a week (its stored label, else "Tuần N"). */
-function weekLabel(w: WeekRow): string {
+export function weekLabel(w: WeekRow): string {
   return w.label ?? t.weekly.weekName(w.week_no);
 }
 
@@ -58,7 +58,7 @@ function monthKeyLabel(key: string): string {
 }
 
 /** Group a class's weeks into months by start_date (YYYY-MM); undated weeks fall into 'other'. */
-function buildMonths(weeks: WeekRow[]): MonthGroup[] {
+export function buildMonths(weeks: WeekRow[]): MonthGroup[] {
   const map = new Map<string, WeekRow[]>();
   for (const w of weeks) {
     const key = w.start_date && w.start_date.length >= 7 ? w.start_date.slice(0, 7) : 'other';
@@ -72,7 +72,7 @@ function buildMonths(weeks: WeekRow[]): MonthGroup[] {
 }
 
 /** Read one week's records and resolve them into per-student observations (tags in catalog order). */
-async function loadWeekObservations(
+export async function loadWeekObservations(
   db: SqlExecutor,
   classId: number,
   weekId: number,
