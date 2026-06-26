@@ -1,11 +1,55 @@
-// Minimal Vietnamese UX copy for the app shell + the two functional pages.
-// Kept as a flat object (no i18n library yet) — the app is Vietnamese-first for the MVP.
-// A real i18n layer (src/lib/i18n) is deferred to a later UI polish milestone.
+// UI copy for the app shell + every functional page.
+//
+// Vietnamese-first by design: `vi` is the canonical, complete dictionary and the default
+// locale. `en` is a *partial* English dictionary — any key it omits falls back to the
+// Vietnamese value via deepMerge, so a missing English string can never crash the UI.
+//
+// Reactivity without an i18n framework: `t` is an exported *live binding* (an exported
+// `let`). `setLocale()` swaps it to the resolved dictionary for the chosen locale; the app
+// shell holds the locale in React state, so switching re-renders the tree and every page
+// (which reads `t` as a module import) picks up the new strings. No per-page wiring needed.
+//
+// Generated GVCN artifact bodies (comments, parent messages, minutes, weekly/monthly
+// reports, exported document text) stay Vietnamese regardless of UI locale — see
+// docs/m8-1-i18n-polish.md. Only the UI chrome here is bilingual.
 
-export const t = {
+export type Locale = 'vi' | 'en';
+
+/** Default UI language. Vietnamese — the product's primary audience. */
+export const DEFAULT_LOCALE: Locale = 'vi';
+
+const STORAGE_KEY = 'gvcn.locale';
+
+// --- Vietnamese (canonical, complete) ---------------------------------------------------
+
+const vi = {
   appTitle: 'GVCN AutoReport',
   appSubtitle: 'Trợ lý chủ nhiệm lớp',
   offline: 'Ngoại tuyến • dữ liệu lưu trên máy',
+
+  lang: {
+    label: 'Ngôn ngữ',
+    vi: 'Tiếng Việt',
+    en: 'English',
+  },
+
+  nav: {
+    dashboard: 'Bảng điều khiển',
+    classes: 'Lớp & Học sinh',
+    import: 'Nhập từ Excel',
+    weekly: 'Ghi nhận tuần',
+    comments: 'Nhận xét học sinh',
+    parent: 'Tin nhắn phụ huynh',
+    minutes: 'Biên bản họp lớp',
+    reports: 'Báo cáo tuần/tháng',
+    exports: 'Xuất DOCX/PDF/XLSX',
+    claude: 'Claude Export',
+    settings: 'Cài đặt',
+  },
+
+  a11y: {
+    mainNav: 'Điều hướng chính',
+  },
 
   common: {
     loading: 'Đang tải…',
@@ -54,6 +98,7 @@ export const t = {
     colRow: 'Dòng',
     colField: 'Cột',
     colMessage: 'Lỗi',
+    readError: 'Không đọc được tệp Excel.',
   },
 
   weekly: {
@@ -195,12 +240,344 @@ export const t = {
       'Tuần này chưa có nhận xét/tin nhắn nào được lưu. Hãy tạo và lưu ở màn hình tương ứng trước, rồi quay lại đây để xuất.',
     exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
   },
-} as const;
+
+  gender: {
+    male: 'Nam',
+    female: 'Nữ',
+    unknown: '—',
+  },
+
+  category: {
+    attendance: 'Chuyên cần',
+    study: 'Học tập',
+    discipline: 'Nề nếp',
+    good_deed: 'Việc tốt',
+    support: 'Cần hỗ trợ',
+  },
+};
+
+/** The full UI dictionary shape (inferred from the canonical Vietnamese copy). */
+export type Dict = typeof vi;
+
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends (...args: never[]) => unknown
+    ? T[K]
+    : T[K] extends object
+      ? DeepPartial<T[K]>
+      : T[K];
+};
+
+// --- English (partial — anything omitted falls back to Vietnamese) ----------------------
+//
+// `appTitle` is intentionally omitted (product name; identical in both languages) so the
+// deepMerge fallback path is exercised in real use and in tests.
+
+const en: DeepPartial<Dict> = {
+  appSubtitle: 'Homeroom teacher assistant',
+  offline: 'Offline • data stored on this device',
+
+  lang: { label: 'Language', vi: 'Tiếng Việt', en: 'English' },
+
+  nav: {
+    dashboard: 'Dashboard',
+    classes: 'Classes & Students',
+    import: 'Import from Excel',
+    weekly: 'Weekly records',
+    comments: 'Student comments',
+    parent: 'Parent messages',
+    minutes: 'Class meeting minutes',
+    reports: 'Weekly/monthly reports',
+    exports: 'Export DOCX/PDF/XLSX',
+    claude: 'Claude Export',
+    settings: 'Settings',
+  },
+
+  a11y: { mainNav: 'Main navigation' },
+
+  common: {
+    loading: 'Loading…',
+    retry: 'Retry',
+    dbUnavailable:
+      'Could not connect to the local database. Please open the desktop app with “npm run tauri dev”.',
+    comingSoon: 'This screen will be added in later steps.',
+  },
+
+  classes: {
+    title: 'Classes & Students',
+    seedDemo: 'Load demo data 8A',
+    seeding: 'Creating demo data…',
+    emptyTitle: 'No classes yet',
+    emptyHint: 'Click “Load demo data 8A” to create a sample class (fake students, no real data).',
+    rosterEmpty: 'This class has no students yet.',
+    colCode: 'Student code',
+    colName: 'Full name',
+    colGender: 'Gender',
+    colNote: 'Note',
+    countLabel: (n: number) => `${n} students`,
+  },
+
+  importPage: {
+    title: 'Import student list from Excel',
+    intro:
+      'Choose a .xlsx file with the student list. It must include “Student code” and “Full name” columns. Other columns (gender, date of birth, note) are optional.',
+    pickFile: 'Choose Excel file (.xlsx)',
+    targetClass: 'Import into class:',
+    noClassTitle: 'No class to import into',
+    noClassHint: 'Please create a sample class on the “Classes & Students” screen first, then come back here.',
+    parsing: 'Reading file…',
+    previewTitle: 'Preview valid rows',
+    errorsTitle: 'Rows with errors (will be skipped)',
+    noErrors: 'No error rows.',
+    noValid: 'No valid rows to import.',
+    rowsSummary: (valid: number, total: number) => `${valid}/${total} valid rows.`,
+    commit: 'Import into class',
+    committing: 'Importing…',
+    committedTitle: 'Import complete',
+    committedSummary: (inserted: number, skipped: number) =>
+      `Added ${inserted} new students; skipped ${skipped} existing codes.`,
+    colRow: 'Row',
+    colField: 'Column',
+    colMessage: 'Error',
+    readError: 'Could not read the Excel file.',
+  },
+
+  weekly: {
+    title: 'Weekly records',
+    intro:
+      'Choose a class and week, then record observations for each student by selecting tags and adding a short note. Use the language of acknowledgement – support – cooperation, not criticism.',
+    classLabel: 'Class:',
+    weekLabel: 'Week:',
+    newWeek: 'Create new week',
+    creatingWeek: 'Creating week…',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Click “Create new week” to start recording the first week.',
+    rosterEmpty: 'This class has no students to record.',
+    notePlaceholder: 'Short note for the student (optional)…',
+    save: 'Save weekly records',
+    saving: 'Saving…',
+    reload: 'Reload',
+    savedTitle: 'Records saved',
+    savedSummary: (n: number) => `Saved records for ${n} students this week.`,
+    nothingToSave: 'No student has tags or a note selected to save.',
+    selectedCount: (n: number) => `${n} tags selected`,
+    weekName: (no: number) => `Week ${no}`,
+  },
+
+  comments: {
+    title: 'Generate student comments',
+    intro:
+      'Choose a recorded class and week. The app generates Vietnamese comments from that week’s tags and notes. You can edit before saving. Comments are generated locally and never sent anywhere.',
+    classLabel: 'Class:',
+    weekLabel: 'Week:',
+    toneLabel: 'Tone:',
+    toneShort: 'Short',
+    toneBalanced: 'Balanced',
+    toneEncouraging: 'Encouraging',
+    regenerate: 'Regenerate comments',
+    save: 'Save comments',
+    saving: 'Saving…',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Please go to the “Weekly records” screen to create a week and record observations first.',
+    noRecords: 'No students recorded for this week yet. Please record on the “Weekly records” screen first.',
+    editedBadge: 'saved',
+    warnBanned: (phrases: string) =>
+      `Note: the comment contains words to avoid (${phrases}). Please soften it to be supportive.`,
+    savedSummary: (n: number) => `Saved ${n} comments for this week.`,
+    nothingToSave: 'No comments to save.',
+  },
+
+  parent: {
+    title: 'Parent messages',
+    intro:
+      'Choose a recorded class and week. The app generates a draft Vietnamese message for parents that is cooperative and respectful. This is only a draft for you to edit and send yourself; the app does not send messages.',
+    classLabel: 'Class:',
+    weekLabel: 'Week:',
+    typeLabel: 'Message type:',
+    typeAuto: 'Automatic from records',
+    typePraise: 'Praise / positive update',
+    typeReminder: 'Gentle reminder',
+    typeCooperation: 'Cooperation request',
+    typeSupport: 'Follow-up & support',
+    regenerate: 'Regenerate message',
+    save: 'Save message',
+    saving: 'Saving…',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Please go to the “Weekly records” screen to create a week and record observations first.',
+    noRecords: 'No students recorded for this week yet. Please record on the “Weekly records” screen first.',
+    savedBadge: 'saved',
+    warnBanned: (phrases: string) =>
+      `Note: the message contains words to avoid (${phrases}). Please soften it to be cooperative.`,
+    savedSummary: (n: number) => `Saved ${n} parent messages for this week.`,
+    nothingToSave: 'No messages to save.',
+  },
+
+  reports: {
+    title: 'Minutes & Reports',
+    intro:
+      'Choose a class and document type. The app aggregates saved records into class meeting minutes or a weekly/monthly report in Vietnamese. You can edit before saving. Everything is generated locally and never sent anywhere.',
+    kindLabel: 'Document type:',
+    kindMinutes: 'Class meeting minutes (week)',
+    kindWeekly: 'Weekly report',
+    kindMonthly: 'Monthly report',
+    classLabel: 'Class:',
+    weekLabel: 'Week:',
+    monthLabel: 'Month:',
+    timeLabel: 'Meeting time (optional):',
+    timePlaceholder: 'e.g. 3:00 PM on 06/09/2025',
+    regenerate: 'Regenerate document',
+    save: 'Save document',
+    saving: 'Saving…',
+    saved: 'saved',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Please go to the “Weekly records” screen to create a week and record observations first.',
+    noMonthTitle: 'No months grouped yet',
+    noMonthHint: 'Weeks need a start date to group by month. Please create weeks on the “Weekly records” screen.',
+    otherMonths: 'Other weeks',
+    warnBanned: (phrases: string) =>
+      `Note: the document contains words to avoid (${phrases}). Please soften it to be supportive.`,
+    savedOk: 'Saved the document for this class.',
+  },
+
+  exportsPage: {
+    title: 'Export files (DOCX / PDF / XLSX)',
+    intro:
+      'Choose a class, document type and week/month to preview, then download a DOCX, XLSX, or print/save a PDF. Files are generated locally, never sent anywhere, and only use recorded data.',
+    classLabel: 'Class:',
+    artifactLabel: 'Document type:',
+    weekLabel: 'Week:',
+    monthLabel: 'Month:',
+    timeLabel: 'Meeting time (optional):',
+    timePlaceholder: 'e.g. 3:00 PM on 06/09/2025',
+    artMinutes: 'Class meeting minutes (week)',
+    artWeekly: 'Weekly report',
+    artMonthly: 'Monthly report',
+    artComments: 'Student comment list',
+    artParentMessages: 'Parent message list',
+    previewTitle: 'Preview the content to export',
+    downloadDocx: 'Download DOCX',
+    downloadXlsx: 'Download XLSX',
+    printPdf: 'Print / Save PDF',
+    exporting: 'Exporting…',
+    docxOnly: '* Comments/messages export to DOCX and XLSX; print/save PDF via the browser.',
+    listFromSaved:
+      'The list is taken from the comments/messages you saved on the matching screens.',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Please go to the “Weekly records” screen to create a week and record observations first.',
+    noMonthTitle: 'No months grouped yet',
+    noMonthHint: 'Weeks need a start date to group by month. Please create weeks on the “Weekly records” screen.',
+    emptyListTitle: 'No content to export',
+    emptyListHint:
+      'No comments/messages saved for this week yet. Please create and save them on the matching screen first, then come back here to export.',
+    exportError: 'Could not export the file. Please try again in the desktop app.',
+  },
+
+  gender: {
+    male: 'Male',
+    female: 'Female',
+    unknown: '—',
+  },
+
+  category: {
+    attendance: 'Attendance',
+    study: 'Study',
+    discipline: 'Discipline',
+    good_deed: 'Good deeds',
+    support: 'Needs support',
+  },
+};
+
+// --- Resolution + live binding ----------------------------------------------------------
+
+function isMergeable(v: unknown): v is Record<string, unknown> {
+  // Plain objects only — functions (typeof 'function') and null are treated as leaves.
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+/** Deep-merge `over` onto `base`; any key absent in `over` keeps the `base` value. */
+function deepMerge<T>(base: T, over: unknown): T {
+  if (!isMergeable(base) || !isMergeable(over)) {
+    return (over === undefined ? base : (over as T));
+  }
+  const out: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+  for (const key of Object.keys(over)) {
+    const o = over[key];
+    if (o === undefined) continue;
+    const b = (base as Record<string, unknown>)[key];
+    out[key] = isMergeable(b) && isMergeable(o) ? deepMerge(b, o) : o;
+  }
+  return out as T;
+}
+
+// Resolve both dictionaries once. `en` falls back to every untranslated `vi` value.
+const dictionaries: Record<Locale, Dict> = {
+  vi,
+  en: deepMerge(vi, en),
+};
+
+let currentLocale: Locale = DEFAULT_LOCALE;
+
+/**
+ * The active UI dictionary. Exported as a live binding: `setLocale()` reassigns it and every
+ * module that imported `t` sees the new value on its next render.
+ */
+export let t: Dict = dictionaries[DEFAULT_LOCALE];
+
+/** Normalize any input to a supported locale (defaults to Vietnamese). */
+export function normalizeLocale(value: unknown): Locale {
+  return value === 'en' ? 'en' : 'vi';
+}
+
+/** The locale currently shown in the UI. */
+export function getLocale(): Locale {
+  return currentLocale;
+}
+
+/** Switch the active UI dictionary. Returns the (normalized) locale that was applied. */
+export function setLocale(value: unknown): Locale {
+  currentLocale = normalizeLocale(value);
+  t = dictionaries[currentLocale];
+  return currentLocale;
+}
+
+/** Read the saved language preference. Safe in any environment (no localStorage → default). */
+export function loadLocale(): Locale {
+  try {
+    return normalizeLocale(globalThis.localStorage?.getItem(STORAGE_KEY));
+  } catch {
+    return DEFAULT_LOCALE;
+  }
+}
+
+/** Persist the language preference. Never throws if localStorage is unavailable. */
+export function saveLocale(value: unknown): void {
+  try {
+    globalThis.localStorage?.setItem(STORAGE_KEY, normalizeLocale(value));
+  } catch {
+    /* localStorage unavailable (e.g. tests / SSR) — preference simply isn't persisted. */
+  }
+}
+
+// --- Label helpers (read the live `t`, so they translate with the active locale) --------
+
+/** Sidebar label for a nav id; falls back to the id if somehow missing. */
+export function navLabel(id: string): string {
+  return (t.nav as Record<string, string>)[id] ?? id;
+}
 
 /** Which report artifact the "Biên bản & Báo cáo" screen is producing. */
 export type ReportKind = 'minutes' | 'weekly' | 'monthly';
 
-/** Vietnamese label for a report-kind choice. */
+/** Label for a report-kind choice. */
 export function reportKindLabel(kind: ReportKind): string {
   switch (kind) {
     case 'minutes':
@@ -215,7 +592,7 @@ export function reportKindLabel(kind: ReportKind): string {
 /** Parent-message type as picked in the UI ('auto' lets the generator derive it per student). */
 export type ParentTypeChoice = 'auto' | 'praise' | 'reminder' | 'cooperation' | 'support';
 
-/** Vietnamese label for a parent-message type choice. */
+/** Label for a parent-message type choice. */
 export function parentTypeLabel(choice: ParentTypeChoice): string {
   switch (choice) {
     case 'praise':
@@ -231,7 +608,7 @@ export function parentTypeLabel(choice: ParentTypeChoice): string {
   }
 }
 
-/** Vietnamese label for a comment tone. */
+/** Label for a comment tone. */
 export function toneLabel(tone: 'short' | 'balanced' | 'encouraging'): string {
   switch (tone) {
     case 'short':
@@ -251,7 +628,7 @@ export type ExportArtifactChoice =
   | 'comments'
   | 'parentMessages';
 
-/** Vietnamese label for an export-artifact choice. */
+/** Label for an export-artifact choice. */
 export function exportArtifactLabel(choice: ExportArtifactChoice): string {
   switch (choice) {
     case 'minutes':
@@ -267,27 +644,14 @@ export function exportArtifactLabel(choice: ExportArtifactChoice): string {
   }
 }
 
-/** Display a stored gender code (M/F or null) as Vietnamese. */
+/** Display a stored gender code (M/F or null) in the active locale. */
 export function genderLabel(gender: string | null): string {
-  if (gender === 'M') return 'Nam';
-  if (gender === 'F') return 'Nữ';
-  return '—';
+  if (gender === 'M') return t.gender.male;
+  if (gender === 'F') return t.gender.female;
+  return t.gender.unknown;
 }
 
-/** Vietnamese label for an observation-tag category (the 5 practical groups). */
+/** Label for an observation-tag category (the 5 practical groups). */
 export function categoryLabel(category: string): string {
-  switch (category) {
-    case 'attendance':
-      return 'Chuyên cần';
-    case 'study':
-      return 'Học tập';
-    case 'discipline':
-      return 'Nề nếp';
-    case 'good_deed':
-      return 'Việc tốt';
-    case 'support':
-      return 'Cần hỗ trợ';
-    default:
-      return category;
-  }
+  return (t.category as Record<string, string>)[category] ?? category;
 }

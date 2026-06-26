@@ -98,8 +98,16 @@
   - Verify: guard test green.
 
 ## M9 — Polish · review · security
-- [ ] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y
-  - Verify: manual + component tests.
+- [~] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y
+  - **i18n slice DONE (M8.1 session):** added **bilingual UI (Vietnamese default + English)**.
+    Centralized all UI chrome into `src/app/i18n.ts` (`vi` canonical + partial `en` with deepMerge
+    fallback to `vi`; live-binding `t` swapped by `setLocale`); moved stray strings (nav labels,
+    main-nav aria-label, ImportPage parse error, gender/category labels) into the dict; language
+    `<select>` in the sidebar persisted to `localStorage['gvcn.locale']`; `document.lang` synced.
+    Generated artifacts + exported document text **remain Vietnamese by design**. `+10` tests.
+    Verify: typecheck 0 · test **110 passed** · build 0 · `cargo check` 0 · `npm audit` 0. See
+    `docs/m8-1-i18n-polish.md`. **Remaining:** broader empty/loading/error audit + fuller a11y
+    (labels/focus/keyboard) and the runtime GUI pass.
 - [x] Reproducible demo checklist (clean machine, offline, 8A end-to-end)
   - **Done (M8 release-readiness session).** `docs/demo-checklist.md` — offline end-to-end manual GUI test (launch → 8A → import → week → comments → messages → minutes/reports → export DOCX/XLSX/PDF → reopen/persist → safety spot-check). `README.md` rewritten from the Tauri stub → install/dev/build commands + demo workflow + known limitations (VN-first). Linux bundle rebuilt after M7: `npm run tauri build` → **`.deb` + `.rpm` produced** (`src-tauri/target/release/bundle/deb|rpm/`, validated via `dpkg-deb`/`file`); AppImage target failed only on missing host `xdg-open` (env, not code). Verify: typecheck 0 · test **100 passed** · build 0 · `cargo check` 0 · `npm audit` 0. See `docs/m8-demo-release-readiness.md`. **Remaining:** the single runtime GUI pass on a machine with a display.
 - [ ] Run `code-review-and-quality`

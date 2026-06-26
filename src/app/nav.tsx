@@ -16,22 +16,22 @@ import { ExportsPage } from '../features/exports/ExportsPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 export interface NavItem {
+  /** Stable id; also the i18n key for the sidebar label (see `t.nav` / `navLabel`). */
   id: string;
-  /** Sidebar label (Vietnamese). */
-  label: string;
   render: () => ReactNode;
 }
 
+// Labels come from `t.nav[id]` via `navLabel(id)` so the sidebar is bilingual — see i18n.ts.
 export const NAV_ITEMS: readonly NavItem[] = [
-  { id: 'dashboard', label: 'Bảng điều khiển', render: () => <PlaceholderPage title="Bảng điều khiển" /> },
-  { id: 'classes', label: 'Lớp & Học sinh', render: () => <ClassesPage /> },
-  { id: 'import', label: 'Nhập từ Excel', render: () => <ImportPage /> },
-  { id: 'weekly', label: 'Ghi nhận tuần', render: () => <WeeklyRecordPage /> },
-  { id: 'comments', label: 'Nhận xét học sinh', render: () => <CommentsPage /> },
-  { id: 'parent', label: 'Tin nhắn phụ huynh', render: () => <ParentMessagesPage /> },
-  { id: 'minutes', label: 'Biên bản họp lớp', render: () => <ReportsPage initialKind="minutes" /> },
-  { id: 'reports', label: 'Báo cáo tuần/tháng', render: () => <ReportsPage initialKind="weekly" /> },
-  { id: 'exports', label: 'Xuất DOCX/PDF/XLSX', render: () => <ExportsPage /> },
-  { id: 'claude', label: 'Claude Export', render: () => <PlaceholderPage title="Claude Export" /> },
-  { id: 'settings', label: 'Cài đặt', render: () => <PlaceholderPage title="Cài đặt" /> },
+  { id: 'dashboard', render: () => <PlaceholderPage navId="dashboard" /> },
+  { id: 'classes', render: () => <ClassesPage /> },
+  { id: 'import', render: () => <ImportPage /> },
+  { id: 'weekly', render: () => <WeeklyRecordPage /> },
+  { id: 'comments', render: () => <CommentsPage /> },
+  { id: 'parent', render: () => <ParentMessagesPage /> },
+  { id: 'minutes', render: () => <ReportsPage initialKind="minutes" /> },
+  { id: 'reports', render: () => <ReportsPage initialKind="weekly" /> },
+  { id: 'exports', render: () => <ExportsPage /> },
+  { id: 'claude', render: () => <PlaceholderPage navId="claude" /> },
+  { id: 'settings', render: () => <PlaceholderPage navId="settings" /> },
 ];

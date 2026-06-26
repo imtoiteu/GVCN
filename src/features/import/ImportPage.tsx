@@ -53,7 +53,7 @@ export function ImportPage() {
       setPhase('parsed');
     } catch {
       // A non-.xlsx or corrupt file lands here; surface as a parse failure.
-      setResult({ valid: [], errors: [{ row: 0, code: 'missing_column', message: 'Không đọc được tệp Excel.' }], totalRows: 0 });
+      setResult({ valid: [], errors: [{ row: 0, code: 'missing_column', message: t.importPage.readError }], totalRows: 0 });
       setPhase('parsed');
     }
   }, []);
