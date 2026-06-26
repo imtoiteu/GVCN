@@ -64,13 +64,14 @@
   - **Logic + UI done (M5 session).** `src/features/parent/ParentMessagesPage.tsx`: choose class+week → read M3 records via DAL + latest M4 comments as fallback context → generate per-student (type selector incl. "Tự động") → editable preview → save via `createParentMessage`; prefill latest via new DAL `listLatestParentMessagesByWeek` (`+2` tests). **Drafts only — no SMS/Zalo/email send.** Verify: build/typecheck 0; tests green. **Runtime GUI smoke-check** (generate→edit→save→reopen prefilled) pending a display. See `docs/m5-parent-message-generation.md`.
 
 ## M6 — Meeting minutes + weekly/monthly reports (TDD)
-- [ ] **TDD** aggregation: minutes (week/class)
-  - Verify: counts/highlights/support list correct.
-- [ ] **TDD** weekly/monthly report (monthly = grouped weeks, Risk #4; empty-period fallback)
-  - Verify: unit tests green.
-- [ ] Minutes + Reports screens preview from recorded data
-  - Verify: previews render from real records.
-- [ ] **Checkpoint D:** all 4 generators produce editable text; safety guards enforced.
+- [x] **TDD** aggregation: minutes (week/class)
+  - **Done (M6 session).** Shared `src/lib/generate/reportData.ts` (`aggregateWeek`/`mergeWeeks` + text helpers) → pure `meetingMinutes.ts` with the 8 requested sections (tình hình chung / ưu điểm / tồn tại / tiêu biểu / cần hỗ trợ / biện pháp GVCN / phương hướng). Counts, distinct-label rollup (student counts, most-common-first), exemplary vs needs-support lists. Reuses M4 `findBannedPhrases`; whole document self-checked clean. `+9` TDD tests. Verify: counts/highlights/support list asserted ✅.
+- [x] **TDD** weekly/monthly report (monthly = grouped weeks, Risk #4; empty-period fallback)
+  - **Done (M6 session).** `homeroomReport.ts`: `generateWeeklyReport` (one class/week) + `generateMonthlyReport` (groups weeks → month via `mergeWeeks`, counts each student once, adds "Diễn biến theo tuần"). Empty week/month/zero-week → safe fallback document, never a crash. Supportive non-blaming framing; banned-free self-check. `+7` TDD tests. Verify: `npm run test` → **75 passed**; typecheck/build 0. See `docs/m6-meeting-minutes-reports.md`.
+- [x] Minutes + Reports screens preview from recorded data
+  - **Logic + UI done (M6 session).** `src/features/reports/ReportsPage.tsx` (one reusable screen, mounted in both `minutes` + `reports` nav slots): choose class → artifact (Biên bản / Báo cáo tuần / Báo cáo tháng) → week (or month, grouped from week `start_date`) → read M3 records via DAL → generate → editable preview → save via existing `createReport`; prefill latest via new DAL `getLatestReport` (`+4` tests). Reuses `homeroom_reports` with artifact-kind encoded in `period_label` — **no migration / no new deps**. Verify: build/typecheck 0; tests green. **Runtime GUI smoke-check** (generate→edit→save→reopen prefilled) pending a display.
+- [~] **Checkpoint D:** all 4 generators produce editable text; safety guards enforced.
+  - **Logic + UI done (M6 session):** M4 comments, M5 parent messages, M6 minutes + weekly/monthly reports all generate respectful, editable Vietnamese text; every generator self-checks its controlled output against the shared M4 banned-phrase guard, and tone is enforced by tests. **Remaining:** a single runtime GUI run on a machine with a display across the four generator screens.
 
 ## M7 — Exports: DOCX / PDF / XLSX
 - [ ] Define generator→export **view-model contract** (before/at start of M7)

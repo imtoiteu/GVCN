@@ -131,7 +131,51 @@ export const t = {
     savedSummary: (n: number) => `Đã lưu ${n} tin nhắn phụ huynh cho tuần này.`,
     nothingToSave: 'Chưa có tin nhắn nào để lưu.',
   },
+
+  reports: {
+    title: 'Biên bản & Báo cáo',
+    intro:
+      'Chọn lớp và loại văn bản. Ứng dụng tổng hợp các ghi nhận đã lưu thành biên bản họp lớp hoặc báo cáo tuần/tháng bằng tiếng Việt. Bạn có thể chỉnh sửa trước khi lưu. Tất cả được tạo cục bộ trên máy, không gửi ra ngoài.',
+    kindLabel: 'Loại văn bản:',
+    kindMinutes: 'Biên bản họp lớp (tuần)',
+    kindWeekly: 'Báo cáo tuần',
+    kindMonthly: 'Báo cáo tháng',
+    classLabel: 'Lớp:',
+    weekLabel: 'Tuần:',
+    monthLabel: 'Tháng:',
+    timeLabel: 'Thời gian họp (tùy chọn):',
+    timePlaceholder: 'VD: 15h00 ngày 06/09/2025',
+    regenerate: 'Tạo lại văn bản',
+    save: 'Lưu văn bản',
+    saving: 'Đang lưu…',
+    saved: 'đã lưu',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Hãy sang màn hình “Ghi nhận tuần” để tạo tuần và ghi nhận quan sát trước.',
+    noMonthTitle: 'Chưa nhóm được tháng nào',
+    noMonthHint: 'Các tuần cần có ngày bắt đầu để nhóm theo tháng. Hãy tạo tuần ở màn hình “Ghi nhận tuần”.',
+    otherMonths: 'Các tuần khác',
+    warnBanned: (phrases: string) =>
+      `Lưu ý: văn bản có chứa từ ngữ nên tránh (${phrases}). Hãy chỉnh lại cho nhẹ nhàng, mang tính hỗ trợ.`,
+    savedOk: 'Đã lưu văn bản cho lớp này.',
+  },
 } as const;
+
+/** Which report artifact the "Biên bản & Báo cáo" screen is producing. */
+export type ReportKind = 'minutes' | 'weekly' | 'monthly';
+
+/** Vietnamese label for a report-kind choice. */
+export function reportKindLabel(kind: ReportKind): string {
+  switch (kind) {
+    case 'minutes':
+      return t.reports.kindMinutes;
+    case 'monthly':
+      return t.reports.kindMonthly;
+    default:
+      return t.reports.kindWeekly;
+  }
+}
 
 /** Parent-message type as picked in the UI ('auto' lets the generator derive it per student). */
 export type ParentTypeChoice = 'auto' | 'praise' | 'reminder' | 'cooperation' | 'support';

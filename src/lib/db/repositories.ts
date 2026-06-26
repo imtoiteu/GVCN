@@ -380,3 +380,24 @@ export function listReportsByClass(
     [classId],
   );
 }
+
+/**
+ * The latest saved report for a (class, period_kind, period_label) triple, so the "Biên bản & Báo
+ * cáo" screen can prefill a previously reviewed artifact. createReport always inserts a new row, so
+ * "latest" = max(id). The M6 screen encodes the artifact kind (minutes / weekly / monthly) into
+ * period_label, so this triple uniquely identifies one artifact instance.
+ */
+export function getLatestReport(
+  exec: SqlExecutor,
+  classId: number,
+  periodKind: ReportPeriodKind,
+  periodLabel: string,
+): Promise<HomeroomReportRow | null> {
+  return one<HomeroomReportRow>(
+    exec,
+    `SELECT * FROM homeroom_reports
+      WHERE class_id = ? AND period_kind = ? AND period_label = ?
+      ORDER BY id DESC LIMIT 1`,
+    [classId, periodKind, periodLabel],
+  );
+}
