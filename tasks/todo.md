@@ -88,6 +88,10 @@
   - **File paths DONE (M7):** DOCX/XLSX/PDF export wired + tested; Claude Export (M8) is the remaining output path.
 
 ## M8 — Claude Export (anonymized) (TDD)
+> **Deferred during the M8 release-readiness session** (offered as optional there). It is the
+> product's highest-risk feature (PII → external paste); it gets its own focused TDD milestone
+> rather than being squeezed into a polish pass. "Claude Export" nav slot stays a placeholder.
+> See `docs/m8-demo-release-readiness.md` "Claude Export decision".
 - [ ] `lib/export/anonymize.ts` (single boundary) + Claude Export screen → clipboard
   - Verify: summary copyable; codes only.
 - [ ] **No-PII test** (no name/phone/address/grade leaks)
@@ -96,8 +100,8 @@
 ## M9 — Polish · review · security
 - [ ] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y
   - Verify: manual + component tests.
-- [ ] Reproducible demo checklist (clean machine, offline, 8A end-to-end)
-  - Verify: checklist runs without network.
+- [x] Reproducible demo checklist (clean machine, offline, 8A end-to-end)
+  - **Done (M8 release-readiness session).** `docs/demo-checklist.md` — offline end-to-end manual GUI test (launch → 8A → import → week → comments → messages → minutes/reports → export DOCX/XLSX/PDF → reopen/persist → safety spot-check). `README.md` rewritten from the Tauri stub → install/dev/build commands + demo workflow + known limitations (VN-first). Linux bundle rebuilt after M7: `npm run tauri build` → **`.deb` + `.rpm` produced** (`src-tauri/target/release/bundle/deb|rpm/`, validated via `dpkg-deb`/`file`); AppImage target failed only on missing host `xdg-open` (env, not code). Verify: typecheck 0 · test **100 passed** · build 0 · `cargo check` 0 · `npm audit` 0. See `docs/m8-demo-release-readiness.md`. **Remaining:** the single runtime GUI pass on a machine with a display.
 - [ ] Run `code-review-and-quality`
   - Verify: no blocking findings.
 - [ ] Run `security-and-hardening` (import validation, local storage, export safety, anonymization)
