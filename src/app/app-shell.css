@@ -269,3 +269,111 @@ body {
   border-color: var(--success-border);
   color: #166534;
 }
+
+/* --- weekly record cards --- */
+.student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 14px 16px;
+}
+
+.student-card__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.student-card__code {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.student-card__name {
+  font-size: 14px;
+}
+
+.student-card__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tag-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tag-group {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.tag-group__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  padding-top: 5px;
+}
+
+.tag-group__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tag-chip:hover {
+  background: #f3f4f6;
+}
+
+/* Subtle sentiment tint on the selected state only — supportive, never alarming. */
+.tag-chip--on {
+  border-color: var(--primary);
+  background: #eaf1ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.tag-chip--concern.tag-chip--on {
+  border-color: #f59e0b;
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.tag-chip--positive.tag-chip--on {
+  border-color: #34d399;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.note-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+}

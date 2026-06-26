@@ -55,6 +55,30 @@ export const t = {
     colField: 'Cột',
     colMessage: 'Lỗi',
   },
+
+  weekly: {
+    title: 'Ghi nhận tuần',
+    intro:
+      'Chọn lớp và tuần, sau đó ghi nhận quan sát cho từng học sinh bằng cách chọn các nhãn và thêm ghi chú ngắn. Dùng ngôn ngữ ghi nhận – hỗ trợ – phối hợp, không phê phán.',
+    classLabel: 'Lớp:',
+    weekLabel: 'Tuần:',
+    newWeek: 'Tạo tuần mới',
+    creatingWeek: 'Đang tạo tuần…',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Bấm “Tạo tuần mới” để bắt đầu ghi nhận cho tuần đầu tiên.',
+    rosterEmpty: 'Lớp này chưa có học sinh để ghi nhận.',
+    notePlaceholder: 'Ghi chú ngắn cho học sinh (tùy chọn)…',
+    save: 'Lưu ghi nhận tuần',
+    saving: 'Đang lưu…',
+    reload: 'Tải lại',
+    savedTitle: 'Đã lưu ghi nhận',
+    savedSummary: (n: number) => `Đã lưu ghi nhận cho ${n} học sinh trong tuần này.`,
+    nothingToSave: 'Chưa có học sinh nào được chọn nhãn hoặc ghi chú để lưu.',
+    selectedCount: (n: number) => `${n} nhãn đã chọn`,
+    weekName: (no: number) => `Tuần ${no}`,
+  },
 } as const;
 
 /** Display a stored gender code (M/F or null) as Vietnamese. */
@@ -62,4 +86,22 @@ export function genderLabel(gender: string | null): string {
   if (gender === 'M') return 'Nam';
   if (gender === 'F') return 'Nữ';
   return '—';
+}
+
+/** Vietnamese label for an observation-tag category (the 5 practical groups). */
+export function categoryLabel(category: string): string {
+  switch (category) {
+    case 'attendance':
+      return 'Chuyên cần';
+    case 'study':
+      return 'Học tập';
+    case 'discipline':
+      return 'Nề nếp';
+    case 'good_deed':
+      return 'Việc tốt';
+    case 'support':
+      return 'Cần hỗ trợ';
+    default:
+      return category;
+  }
 }

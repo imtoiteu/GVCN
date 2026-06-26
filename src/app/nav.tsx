@@ -8,6 +8,7 @@
 import type { ReactNode } from 'react';
 import { ClassesPage } from '../features/classes/ClassesPage';
 import { ImportPage } from '../features/import/ImportPage';
+import { WeeklyRecordPage } from '../features/weekly/WeeklyRecordPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 export interface NavItem {
@@ -21,7 +22,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'dashboard', label: 'Bảng điều khiển', render: () => <PlaceholderPage title="Bảng điều khiển" /> },
   { id: 'classes', label: 'Lớp & Học sinh', render: () => <ClassesPage /> },
   { id: 'import', label: 'Nhập từ Excel', render: () => <ImportPage /> },
-  { id: 'weekly', label: 'Ghi nhận tuần', render: () => <PlaceholderPage title="Ghi nhận tuần" /> },
+  { id: 'weekly', label: 'Ghi nhận tuần', render: () => <WeeklyRecordPage /> },
   { id: 'comments', label: 'Nhận xét học sinh', render: () => <PlaceholderPage title="Nhận xét học sinh" /> },
   { id: 'parent', label: 'Tin nhắn phụ huynh', render: () => <PlaceholderPage title="Tin nhắn phụ huynh" /> },
   { id: 'minutes', label: 'Biên bản họp lớp', render: () => <PlaceholderPage title="Biên bản họp lớp" /> },

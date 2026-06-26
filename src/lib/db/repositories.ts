@@ -17,6 +17,7 @@ import type {
   NewWeeklyRecord,
   ObservationTagRow,
   ParentMessageRow,
+  RecordTagRow,
   ReportPeriodKind,
   StudentRow,
   TagCategory,
@@ -198,6 +199,60 @@ export function listTagsForRecord(
       ORDER BY t.sort_order ASC`,
     [recordId],
   );
+}
+
+/**
+ * All weekly records for a given week (one row per student that has a saved record).
+ * Batch read for the Weekly Record screen — avoids an N+1 per-student lookup.
+ */
+export function listWeeklyRecordsByWeek(
+  exec: SqlExecutor,
+  weekId: number,
+): Promise<WeeklyRecordRow[]> {
+  return exec.select<WeeklyRecordRow>(
+    `SELECT * FROM weekly_records WHERE week_id = ? ORDER BY student_id ASC`,
+    [weekId],
+  );
+}
+
+/**
+ * Every (record_id, tag_id) pair for all records in a week, in one query, so the UI can
+ * rebuild each student's selected-tag set without a query per record.
+ */
+export function listRecordTagIdsByWeek(
+  exec: SqlExecutor,
+  weekId: number,
+): Promise<RecordTagRow[]> {
+  return exec.select<RecordTagRow>(
+    `SELECT rt.record_id, rt.tag_id
+       FROM record_tags rt
+       JOIN weekly_records wr ON wr.id = rt.record_id
+      WHERE wr.week_id = ?`,
+    [weekId],
+  );
+}
+
+/**
+ * Save a student's weekly observation in one call: upsert the (student, week) record's
+ * teacher_notes and replace its full tag set. Returns the record id. Composes the existing
+ * upsertWeeklyRecord + setRecordTags primitives so save and reload stay symmetric.
+ */
+export async function saveWeeklyRecord(
+  exec: SqlExecutor,
+  input: {
+    student_id: number;
+    week_id: number;
+    teacher_notes?: string | null;
+    tagIds: number[];
+  },
+): Promise<number> {
+  const recordId = await upsertWeeklyRecord(exec, {
+    student_id: input.student_id,
+    week_id: input.week_id,
+    teacher_notes: input.teacher_notes ?? null,
+  });
+  await setRecordTags(exec, recordId, input.tagIds);
+  return recordId;
 }
 
 // ---- generated artifacts --------------------------------------------------

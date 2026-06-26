@@ -40,13 +40,14 @@
   - **Logic + UI DONE (M2.5):** `seedDemoClass` + import commit → roster built (12 demo + 2 imported, 1 skipped); tests green. Classes + Import screens now drive this path through the UI. **Remaining:** a single runtime GUI run (seed 8A → import a fixture `.xlsx` → see roster grow) on a machine with a display.
 
 ## M3 — Weekly records + tag catalog
-- [ ] Confirm tag taxonomy with teacher (Risk #3)
-  - Verify: categories/labels signed off.
-- [ ] Week management (create/select week per class)
-  - Verify: week persists.
-- [ ] Weekly Record screen: per-student tags + `teacher_notes` → `weekly_record`/`record_tag`
-  - Verify: record ≥3 students; reopen after restart shows data.
-- [ ] **Checkpoint C:** class→students→week→records loop works end-to-end (review point).
+- [~] Confirm tag taxonomy with teacher (Risk #3)
+  - **Deferred, not blocking (M3 session).** The 22-tag catalog (`002_seed_tags.sql`) is treated as *provisional* — tags are data, so the catalog can change with no schema/screen change. M3 ships against it; sign-off + tag-catalog CRUD remain open. See `docs/m3-weekly-records.md`. Verify: categories/labels signed off (pending teacher).
+- [x] Week management (create/select week per class)
+  - **Done (M3 session).** "Ghi nhận tuần" screen: class `<select>` → week `<select>` + **"Tạo tuần mới"** (`createWeek`, next `week_no`). DAL `createWeek`/`listWeeksByClass` (M1) drive it. Verify: build/typecheck 0; tests green. Week-persists-across-restart is the runtime GUI smoke-check (needs a display).
+- [x] Weekly Record screen: per-student tags + `teacher_notes` → `weekly_record`/`record_tag`
+  - **Logic + UI done (M3 session).** `src/features/weekly/WeeklyRecordPage.tsx`: per-student tag chips grouped by the 5 categories + note textarea → `saveWeeklyRecord` (upsert record + replace tags); reload via `listWeeklyRecordsByWeek`/`listRecordTagIdsByWeek`. DAL: +3 functions in `repositories.ts`, +4 TDD tests (`__tests__/weekly.test.ts`). Verify: `npm run test` → **25 passed**; build/typecheck 0. **Runtime GUI smoke-check** (record ≥3 students; reopen after restart shows data) still pending a display. See `docs/m3-weekly-records.md`.
+- [~] **Checkpoint C:** class→students→week→records loop works end-to-end (review point).
+  - **Logic + UI done (M3 session):** the full loop (seed/import roster → create/select week → tag + note per student → save → reload) is wired and unit-tested. **Remaining:** a single runtime GUI run on a machine with a display (`npm run tauri dev`) to confirm persistence across restart.
 
 ## M4 — Comment generation (TDD)
 - [ ] **TDD** `lib/generate/comment.ts`: tags+notes → Vietnamese comment (sentiment balance, empty fallback)
