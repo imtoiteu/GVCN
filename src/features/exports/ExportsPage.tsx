@@ -103,6 +103,7 @@ export function ExportsPage() {
 
   const [model, setModel] = useState<ExportModel | null>(null);
   const [emptyList, setEmptyList] = useState(false);
+  const [emptyData, setEmptyData] = useState(false);
   const [busy, setBusy] = useState(false);
   const [exportErr, setExportErr] = useState(false);
 
@@ -120,6 +121,7 @@ export function ExportsPage() {
     }) => {
       const db = await getDb();
       setEmptyList(false);
+      setEmptyData(false);
       setExportErr(false);
 
       if (p.artifact === 'monthlyReport') {
@@ -128,9 +130,13 @@ export function ExportsPage() {
           return;
         }
         const weekInputs = [];
+        let monthRecorded = 0;
         for (const w of p.monthGroup.weeks) {
-          weekInputs.push({ weekLabel: weekLabel(w), records: await loadWeekObservations(db, p.classId, w.id) });
+          const records = await loadWeekObservations(db, p.classId, w.id);
+          monthRecorded += records.length;
+          weekInputs.push({ weekLabel: weekLabel(w), records });
         }
+        setEmptyData(monthRecorded === 0);
         const report = generateMonthlyReport({
           className: p.className,
           periodLabel: p.monthGroup.label,
@@ -156,6 +162,7 @@ export function ExportsPage() {
 
       if (p.artifact === 'minutes' || p.artifact === 'weeklyReport') {
         const records = await loadWeekObservations(db, p.classId, p.week.id);
+        setEmptyData(records.length === 0);
         const gen =
           p.artifact === 'minutes'
             ? generateMeetingMinutes({ className: p.className, weekLabel: wl, meetingTime: p.time, records })
@@ -458,6 +465,7 @@ export function ExportsPage() {
           </div>
 
           {exportErr && <div className="state state--error">{t.exportsPage.exportError}</div>}
+          {emptyData && <div className="state state--warning">{t.exportsPage.emptyDataWarning}</div>}
           {isList(artifact) && <p className="muted">{t.exportsPage.listFromSaved}</p>}
 
           <article className="student-card">

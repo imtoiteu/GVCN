@@ -1,11 +1,11 @@
 // Navigation model for the app shell.
 //
-// Lists all 12 MVP screens from SPEC §4 so the shell reflects the real product surface.
-// For this bridging milestone only two screens are functional (Classes, Import); the rest
-// render a Vietnamese placeholder until their milestone lands. Navigation is plain in-memory
-// state (no router dependency yet) — see AppShell.
+// Lists the MVP screens from SPEC §4. As of M9.1 every entry renders a real screen (dashboard and
+// settings were the last placeholders). Navigation is plain in-memory state (no router dependency);
+// cross-screen jumps use the AppNav context — see AppShell / nav-context.
 
 import type { ReactNode } from 'react';
+import { DashboardPage } from '../features/dashboard/DashboardPage';
 import { ClassesPage } from '../features/classes/ClassesPage';
 import { ImportPage } from '../features/import/ImportPage';
 import { WeeklyRecordPage } from '../features/weekly/WeeklyRecordPage';
@@ -14,7 +14,7 @@ import { ParentMessagesPage } from '../features/parent/ParentMessagesPage';
 import { ReportsPage } from '../features/reports/ReportsPage';
 import { ExportsPage } from '../features/exports/ExportsPage';
 import { ClaudeExportPage } from '../features/claude/ClaudeExportPage';
-import { PlaceholderPage } from './pages/PlaceholderPage';
+import { SettingsPage } from '../features/settings/SettingsPage';
 
 export interface NavItem {
   /** Stable id; also the i18n key for the sidebar label (see `t.nav` / `navLabel`). */
@@ -24,7 +24,7 @@ export interface NavItem {
 
 // Labels come from `t.nav[id]` via `navLabel(id)` so the sidebar is bilingual — see i18n.ts.
 export const NAV_ITEMS: readonly NavItem[] = [
-  { id: 'dashboard', render: () => <PlaceholderPage navId="dashboard" /> },
+  { id: 'dashboard', render: () => <DashboardPage /> },
   { id: 'classes', render: () => <ClassesPage /> },
   { id: 'import', render: () => <ImportPage /> },
   { id: 'weekly', render: () => <WeeklyRecordPage /> },
@@ -34,5 +34,5 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'reports', render: () => <ReportsPage initialKind="weekly" /> },
   { id: 'exports', render: () => <ExportsPage /> },
   { id: 'claude', render: () => <ClaudeExportPage /> },
-  { id: 'settings', render: () => <PlaceholderPage navId="settings" /> },
+  { id: 'settings', render: () => <SettingsPage /> },
 ];

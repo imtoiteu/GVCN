@@ -141,3 +141,19 @@ export type NewWeeklyRecord = {
   week_id: number;
   teacher_notes?: string | null;
 };
+
+// ---- Update payloads (M9.1 CRUD) ------------------------------------------
+
+export type ClassPatch = {
+  name: string;
+  school_year: string;
+  homeroom_teacher?: string | null;
+};
+
+export type StudentPatch = {
+  student_code: string;
+  full_name: string;
+  gender?: string | null;
+  dob?: string | null;
+  note?: string | null;
+};

@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { NAV_ITEMS } from './nav';
+import { AppNavProvider } from './nav-context';
 import {
   t,
   navLabel,
@@ -17,7 +18,7 @@ import {
 import './app-shell.css';
 
 export function AppShell() {
-  const [activeId, setActiveId] = useState<string>('classes');
+  const [activeId, setActiveId] = useState<string>('dashboard');
   // Initialize the active dictionary synchronously (before children render) from the saved
   // preference, so a stored English choice shows immediately with no Vietnamese flash.
   const [locale, setLocaleState] = useState<Locale>(() => setLocale(loadLocale()));
@@ -79,7 +80,11 @@ export function AppShell() {
           {t.offline}
         </div>
       </aside>
-      <main className="shell__content">{active.render()}</main>
+      <main className="shell__content">
+        <AppNavProvider value={{ activeId, navigate: setActiveId, locale, setLocale: changeLocale }}>
+          {active.render()}
+        </AppNavProvider>
+      </main>
     </div>
   );
 }

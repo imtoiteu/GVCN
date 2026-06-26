@@ -126,8 +126,11 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
 
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
+  const [emptyData, setEmptyData] = useState(false);
 
   const className = classes.find((c) => c.id === classId)?.name ?? '';
+  // Title + default artifact match the sidebar entry the screen was opened from (M9.1 clarity).
+  const pageTitle = initialKind === 'minutes' ? t.reports.titleMinutes : t.reports.titleReports;
 
   // Generate the document for the current selection. `useSaved` prefills a previously saved version
   // (same class/kind/period) when one exists; otherwise the freshly generated text is shown.
@@ -146,20 +149,24 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
 
       let gen = '';
       let tgt: ReportTarget | null = null;
+      let recordedCount = 0;
 
       if (p.kind === 'monthly') {
         if (!p.monthGroup) {
-          setGenerated(''); setText(''); setHasSaved(false); setTarget(null);
+          setGenerated(''); setText(''); setHasSaved(false); setTarget(null); setEmptyData(false);
           return;
         }
         const weekInputs = [];
         for (const w of p.monthGroup.weeks) {
-          weekInputs.push({ weekLabel: weekLabel(w), records: await loadWeekObservations(db, p.classId, w.id) });
+          const records = await loadWeekObservations(db, p.classId, w.id);
+          recordedCount += records.length;
+          weekInputs.push({ weekLabel: weekLabel(w), records });
         }
         gen = generateMonthlyReport({ className: p.className, periodLabel: p.monthGroup.label, weeks: weekInputs }).text;
         tgt = { periodKind: 'month', periodLabel: `Báo cáo tháng · ${p.monthGroup.label}`, weekId: null };
       } else if (p.week) {
         const records = await loadWeekObservations(db, p.classId, p.week.id);
+        recordedCount = records.length;
         const wl = weekLabel(p.week);
         if (p.kind === 'minutes') {
           gen = generateMeetingMinutes({ className: p.className, weekLabel: wl, meetingTime: p.time, records }).text;
@@ -169,9 +176,11 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
           tgt = { periodKind: 'week', periodLabel: `Báo cáo tuần · ${wl}`, weekId: p.week.id };
         }
       } else {
-        setGenerated(''); setText(''); setHasSaved(false); setTarget(null);
+        setGenerated(''); setText(''); setHasSaved(false); setTarget(null); setEmptyData(false);
         return;
       }
+
+      setEmptyData(recordedCount === 0);
 
       let body = gen;
       let saved = false;
@@ -295,7 +304,7 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
   if (status === 'loading') {
     return (
       <section className="page">
-        <h1 className="page__title">{t.reports.title}</h1>
+        <h1 className="page__title">{pageTitle}</h1>
         <div className="state state--loading">{t.common.loading}</div>
       </section>
     );
@@ -304,7 +313,7 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
   if (status === 'error') {
     return (
       <section className="page">
-        <h1 className="page__title">{t.reports.title}</h1>
+        <h1 className="page__title">{pageTitle}</h1>
         <div className="state state--error">
           <p>{t.common.dbUnavailable}</p>
           <button type="button" className="btn" onClick={() => void load()}>
@@ -318,7 +327,7 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
   if (classes.length === 0) {
     return (
       <section className="page">
-        <h1 className="page__title">{t.reports.title}</h1>
+        <h1 className="page__title">{pageTitle}</h1>
         <div className="state state--empty">
           <h2>{t.reports.noClassTitle}</h2>
           <p>{t.reports.noClassHint}</p>
@@ -334,7 +343,7 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
   return (
     <section className="page">
       <header className="page__header">
-        <h1 className="page__title">{t.reports.title}</h1>
+        <h1 className="page__title">{pageTitle}</h1>
         <button
           type="button"
           className="btn btn--primary"
@@ -446,6 +455,10 @@ export function ReportsPage({ initialKind = 'weekly' }: { initialKind?: ReportKi
       </div>
 
       {savedOk && <div className="state state--success">{t.reports.savedOk}</div>}
+
+      {!noPeriod && emptyData && (
+        <div className="state state--warning">{t.reports.emptyDataWarning}</div>
+      )}
 
       {noPeriod ? (
         <div className="state state--empty">

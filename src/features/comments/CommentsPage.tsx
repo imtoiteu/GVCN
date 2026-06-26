@@ -25,6 +25,7 @@ import {
   type CommentTone,
 } from '../../lib/generate/comment';
 import { t, toneLabel } from '../../app/i18n';
+import { useAppNav } from '../../app/nav-context';
 
 type Status = 'loading' | 'error' | 'ready';
 
@@ -41,6 +42,7 @@ interface CommentItem {
 const TONES: CommentTone[] = ['balanced', 'short', 'encouraging'];
 
 export function CommentsPage() {
+  const { navigate } = useAppNav();
   const [status, setStatus] = useState<Status>('loading');
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [classId, setClassId] = useState<number | null>(null);
@@ -340,7 +342,12 @@ export function CommentsPage() {
           <p>{t.comments.noWeekHint}</p>
         </div>
       ) : items.length === 0 ? (
-        <div className="state state--empty">{t.comments.noRecords}</div>
+        <div className="state state--empty">
+          <p>{t.comments.noRecords}</p>
+          <button type="button" className="btn btn--primary" onClick={() => navigate('weekly')}>
+            {t.actions.goWeekly}
+          </button>
+        </div>
       ) : (
         <div className="student-list">
           {items.map((it) => {

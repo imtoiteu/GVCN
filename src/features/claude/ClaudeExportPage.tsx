@@ -25,6 +25,7 @@ import {
 import type { RosterEntry } from '../../lib/export';
 import { buildMonths, weekLabel, type MonthGroup } from '../reports/ReportsPage';
 import { t, toneLabel } from '../../app/i18n';
+import { useAppNav } from '../../app/nav-context';
 
 type Status = 'loading' | 'error' | 'ready';
 type PeriodKind = 'week' | 'month';
@@ -99,6 +100,7 @@ async function loadPeriodRaw(
 }
 
 export function ClaudeExportPage() {
+  const { navigate } = useAppNav();
   const [status, setStatus] = useState<Status>('loading');
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [classId, setClassId] = useState<number | null>(null);
@@ -406,6 +408,9 @@ export function ClaudeExportPage() {
         <div className="state state--empty">
           <h2>{t.claudeExport.noDataTitle}</h2>
           <p>{t.claudeExport.noDataHint}</p>
+          <button type="button" className="btn btn--primary" onClick={() => navigate('weekly')}>
+            {t.actions.goWeekly}
+          </button>
         </div>
       ) : text ? (
         <>

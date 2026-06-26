@@ -26,6 +26,7 @@ import {
   type ParentTag,
 } from '../../lib/generate/parentMessage';
 import { parentTypeLabel, t, type ParentTypeChoice } from '../../app/i18n';
+import { useAppNav } from '../../app/nav-context';
 
 type Status = 'loading' | 'error' | 'ready';
 
@@ -46,6 +47,7 @@ const TYPE_CHOICES: ParentTypeChoice[] = [
 ];
 
 export function ParentMessagesPage() {
+  const { navigate } = useAppNav();
   const [status, setStatus] = useState<Status>('loading');
   const [classes, setClasses] = useState<ClassRow[]>([]);
   const [classId, setClassId] = useState<number | null>(null);
@@ -345,7 +347,12 @@ export function ParentMessagesPage() {
           <p>{t.parent.noWeekHint}</p>
         </div>
       ) : items.length === 0 ? (
-        <div className="state state--empty">{t.parent.noRecords}</div>
+        <div className="state state--empty">
+          <p>{t.parent.noRecords}</p>
+          <button type="button" className="btn btn--primary" onClick={() => navigate('weekly')}>
+            {t.actions.goWeekly}
+          </button>
+        </div>
       ) : (
         <div className="student-list">
           {items.map((it) => {

@@ -8,6 +8,7 @@
 
 import type { SqlExecutor } from './executor';
 import type {
+  ClassPatch,
   ClassRow,
   GeneratedCommentRow,
   HomeroomReportRow,
@@ -19,6 +20,7 @@ import type {
   ParentMessageRow,
   RecordTagRow,
   ReportPeriodKind,
+  StudentPatch,
   StudentRow,
   TagCategory,
   WeeklyRecordRow,
@@ -78,9 +80,22 @@ export function createStudent(exec: SqlExecutor, s: NewStudent): Promise<number>
   );
 }
 
+/**
+ * Active roster for a class (the operational list used by records / generators / exports).
+ * Archived students (is_active = 0) are excluded so they no longer appear in weekly records,
+ * generated artifacts, or exports — but their historical rows are preserved.
+ */
 export function listStudentsByClass(exec: SqlExecutor, classId: number): Promise<StudentRow[]> {
   return exec.select<StudentRow>(
-    `SELECT * FROM students WHERE class_id = ? ORDER BY student_code ASC`,
+    `SELECT * FROM students WHERE class_id = ? AND is_active = 1 ORDER BY student_code ASC`,
+    [classId],
+  );
+}
+
+/** Full roster including archived students — for the Classes management screen only. */
+export function listAllStudentsByClass(exec: SqlExecutor, classId: number): Promise<StudentRow[]> {
+  return exec.select<StudentRow>(
+    `SELECT * FROM students WHERE class_id = ? ORDER BY is_active DESC, student_code ASC`,
     [classId],
   );
 }
@@ -400,4 +415,168 @@ export function getLatestReport(
       ORDER BY id DESC LIMIT 1`,
     [classId, periodKind, periodLabel],
   );
+}
+
+// ---- M9.1 CRUD: classes ---------------------------------------------------
+
+async function count(exec: SqlExecutor, sql: string, params: unknown[]): Promise<number> {
+  const row = await one<{ n: number }>(exec, sql, params);
+  return row?.n ?? 0;
+}
+
+/** Update a class's name / school year / homeroom teacher. UNIQUE(name, school_year) still applies. */
+export async function updateClass(exec: SqlExecutor, id: number, patch: ClassPatch): Promise<void> {
+  await exec.execute(
+    `UPDATE classes SET name = ?, school_year = ?, homeroom_teacher = ? WHERE id = ?`,
+    [patch.name, patch.school_year, patch.homeroom_teacher ?? null, id],
+  );
+}
+
+/** Does another class already use this (name, school_year)? `exceptId` excludes the row being edited. */
+export async function classExists(
+  exec: SqlExecutor,
+  name: string,
+  schoolYear: string,
+  exceptId?: number,
+): Promise<boolean> {
+  const n = await count(
+    exec,
+    `SELECT COUNT(*) AS n FROM classes WHERE name = ? AND school_year = ? AND id <> ?`,
+    [name, schoolYear, exceptId ?? -1],
+  );
+  return n > 0;
+}
+
+/** Total students (active + archived) in a class — drives the delete guard. */
+export function countStudentsInClass(exec: SqlExecutor, classId: number): Promise<number> {
+  return count(exec, `SELECT COUNT(*) AS n FROM students WHERE class_id = ?`, [classId]);
+}
+
+/**
+ * Delete a class ONLY when it has no students (so the ON DELETE CASCADE never destroys roster or
+ * records). Returns whether it was deleted and the blocking student count. Non-destructive by design.
+ */
+export async function deleteClassIfEmpty(
+  exec: SqlExecutor,
+  id: number,
+): Promise<{ deleted: boolean; studentCount: number }> {
+  const studentCount = await countStudentsInClass(exec, id);
+  if (studentCount > 0) return { deleted: false, studentCount };
+  await exec.execute(`DELETE FROM classes WHERE id = ?`, [id]);
+  return { deleted: true, studentCount: 0 };
+}
+
+// ---- M9.1 CRUD: students --------------------------------------------------
+
+/** Update a student's editable fields. UNIQUE(class_id, student_code) still applies. */
+export async function updateStudent(
+  exec: SqlExecutor,
+  id: number,
+  patch: StudentPatch,
+): Promise<void> {
+  await exec.execute(
+    `UPDATE students SET student_code = ?, full_name = ?, gender = ?, dob = ?, note = ? WHERE id = ?`,
+    [patch.student_code, patch.full_name, patch.gender ?? null, patch.dob ?? null, patch.note ?? null, id],
+  );
+}
+
+/** Is `code` already used by another student in this class? `exceptId` excludes the row being edited. */
+export async function studentCodeExists(
+  exec: SqlExecutor,
+  classId: number,
+  code: string,
+  exceptId?: number,
+): Promise<boolean> {
+  const n = await count(
+    exec,
+    `SELECT COUNT(*) AS n FROM students WHERE class_id = ? AND student_code = ? AND id <> ?`,
+    [classId, code, exceptId ?? -1],
+  );
+  return n > 0;
+}
+
+/** Archive (is_active = 0) or restore (1) a student — the safe, non-destructive "remove". */
+export async function setStudentActive(
+  exec: SqlExecutor,
+  id: number,
+  active: boolean,
+): Promise<void> {
+  await exec.execute(`UPDATE students SET is_active = ? WHERE id = ?`, [active ? 1 : 0, id]);
+}
+
+/** Count rows that reference this student (weekly records + comments + parent messages). */
+export async function countLinkedRecordsForStudent(
+  exec: SqlExecutor,
+  studentId: number,
+): Promise<number> {
+  const records = await count(
+    exec,
+    `SELECT COUNT(*) AS n FROM weekly_records WHERE student_id = ?`,
+    [studentId],
+  );
+  const comments = await count(
+    exec,
+    `SELECT COUNT(*) AS n FROM generated_comments WHERE student_id = ?`,
+    [studentId],
+  );
+  const messages = await count(
+    exec,
+    `SELECT COUNT(*) AS n FROM parent_messages WHERE student_id = ?`,
+    [studentId],
+  );
+  return records + comments + messages;
+}
+
+/**
+ * Hard-delete a student ONLY when nothing references them; otherwise refuse (caller should archive
+ * instead). Prevents the ON DELETE CASCADE from silently destroying records/comments/messages.
+ */
+export async function deleteStudentIfNoRecords(
+  exec: SqlExecutor,
+  id: number,
+): Promise<{ deleted: boolean; linkedCount: number }> {
+  const linkedCount = await countLinkedRecordsForStudent(exec, id);
+  if (linkedCount > 0) return { deleted: false, linkedCount };
+  await exec.execute(`DELETE FROM students WHERE id = ?`, [id]);
+  return { deleted: true, linkedCount: 0 };
+}
+
+// ---- M9.1 dashboard counts ------------------------------------------------
+
+export function countClasses(exec: SqlExecutor): Promise<number> {
+  return count(exec, `SELECT COUNT(*) AS n FROM classes`, []);
+}
+
+/** Active students in a class. */
+export function countActiveStudents(exec: SqlExecutor, classId: number): Promise<number> {
+  return count(
+    exec,
+    `SELECT COUNT(*) AS n FROM students WHERE class_id = ? AND is_active = 1`,
+    [classId],
+  );
+}
+
+/** Saved comments for a class (across all its students). */
+export function countCommentsByClass(exec: SqlExecutor, classId: number): Promise<number> {
+  return count(
+    exec,
+    `SELECT COUNT(*) AS n FROM generated_comments gc
+       JOIN students s ON s.id = gc.student_id WHERE s.class_id = ?`,
+    [classId],
+  );
+}
+
+/** Saved parent messages for a class (across all its students). */
+export function countParentMessagesByClass(exec: SqlExecutor, classId: number): Promise<number> {
+  return count(
+    exec,
+    `SELECT COUNT(*) AS n FROM parent_messages pm
+       JOIN students s ON s.id = pm.student_id WHERE s.class_id = ?`,
+    [classId],
+  );
+}
+
+/** Saved reports/minutes for a class. */
+export function countReportsByClass(exec: SqlExecutor, classId: number): Promise<number> {
+  return count(exec, `SELECT COUNT(*) AS n FROM homeroom_reports WHERE class_id = ?`, [classId]);
 }

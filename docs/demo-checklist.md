@@ -71,6 +71,21 @@ For **each** artifact (Biên bản · Báo cáo tuần · Báo cáo tháng · Da
 - [ ] No surveillance/behavior-scoring framing; copy uses "ghi nhận / hỗ trợ / phối hợp / tiến bộ".
 - [ ] Exported filenames are ASCII slugs; exported text contains only fake demo data.
 
+## 11. Dashboard & Settings (M9.1)
+- [ ] App opens on the **Dashboard**; summary cards show correct counts; quick-action buttons navigate to the right screens; workflow guide is readable.
+- [ ] **Settings:** switch language (Tiếng Việt ⇄ English) — the whole UI updates and the choice persists after relaunch.
+- [ ] Settings clearly states local-first, no cloud, nothing auto-sent, and the anonymized-AI-export note.
+
+## 12. Class & Student CRUD (M9.1)
+- [ ] **Add/edit a class**; a duplicate name+year is rejected with a message.
+- [ ] **Delete class** is blocked while it has students; allowed once empty.
+- [ ] **Add/edit a student**; a duplicate student code within the class is rejected.
+- [ ] **Archive** a student → they disappear from the active roster, weekly records, generators and exports; **Restore** brings them back ("Show archived" reveals them).
+- [ ] **Hard delete** is blocked for a student that has records (offers archive); allowed for a brand-new student with none.
+- [ ] **Demo button** shows "Dữ liệu mẫu 8A đã có" after 8A exists; reloading does not duplicate or wipe data.
+- [ ] Empty **Comments / Parent / AI-Export** screens show a "Đi tới Ghi nhận tuần" button that navigates.
+- [ ] **Reports / Exports** show the "no recorded data" warning for an empty week/month; the two reports sidebar entries show distinct titles.
+
 ---
 
 ### Result

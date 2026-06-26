@@ -110,6 +110,26 @@
     Verify: `npm run test` → **132 passed** (+22). ✅
 
 ## M9 — Polish · review · security
+
+### M9.1 — Demo UX Polish + Basic CRUD (done)
+- [x] Real Dashboard (summary cards + quick actions + workflow) and real Settings (language +
+  privacy/local-first/AI-export/storage/demo/no-cloud + version), replacing the placeholders.
+  `src/features/dashboard/DashboardPage.tsx` + pure `src/lib/dashboard/dashboardSummary.ts`,
+  `src/features/settings/SettingsPage.tsx`; app opens on the Dashboard. In-app navigation +
+  shared locale via `src/app/nav-context.tsx`.
+- [x] Basic **class CRUD** (add/edit; duplicate name+year blocked; delete only when empty) and
+  **student CRUD** (add/edit; duplicate code blocked; **archive/restore** via `is_active`; hard
+  delete blocked when linked records exist). DAL: `updateClass`/`classExists`/`deleteClassIfEmpty`/
+  `updateStudent`/`studentCodeExists`/`setStudentActive`/`countLinkedRecordsForStudent`/
+  `deleteStudentIfNoRecords`/`listAllStudentsByClass` + dashboard counts. **No DB migration.**
+- [x] Smarter demo button (shows "đã có" + non-wiping reload), empty-state CTAs (Comments/Parent/
+  AI-Export → "Đi tới Ghi nhận tuần"), empty-data warnings on Reports/Exports, reports title matches
+  the sidebar entry, vi+en i18n for all new strings, CSS-only visual polish.
+- [x] Tests: `crud.test.ts` (+7), `dashboardSummary.test.ts` (+5), i18n (+2). Verify: typecheck 0 ·
+  test **146 passed** · build 0 · `cargo check` 0 · `npm audit` 0. `tauri build` not needed (no
+  runtime/config/migration change). See `docs/m9-1-demo-ux-crud-polish.md`. **Remaining:** MacBook
+  GUI pass (see `docs/demo-checklist.md` §11–12).
+
 - [~] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y
   - **i18n slice DONE (M8.1 session):** added **bilingual UI (Vietnamese default + English)**.
     Centralized all UI chrome into `src/app/i18n.ts` (`vi` canonical + partial `en` with deepMerge

@@ -53,6 +53,38 @@ describe('English locale', () => {
   });
 });
 
+describe('M9.1 dashboard / settings / CRUD keys exist in both locales', () => {
+  it('has non-empty strings for the new screens and labels', () => {
+    for (const loc of ['vi', 'en'] as const) {
+      setLocale(loc);
+      // dashboard
+      expect(t.dashboard.title.length).toBeGreaterThan(0);
+      expect(t.dashboard.quickActionsTitle.length).toBeGreaterThan(0);
+      expect(t.dashboard.recordedOf(2, 5)).toContain('2');
+      // settings
+      expect(t.settings.title.length).toBeGreaterThan(0);
+      expect(t.settings.noCloudDesc.length).toBeGreaterThan(0);
+      // shared actions + CRUD
+      expect(t.actions.goWeekly.length).toBeGreaterThan(0);
+      expect(t.classes.addStudent.length).toBeGreaterThan(0);
+      expect(t.classes.deleteStudentBlocked(3)).toContain('3');
+      expect(t.classes.deleteClassBlocked(2)).toContain('2');
+      // empty-data warnings
+      expect(t.reports.emptyDataWarning.length).toBeGreaterThan(0);
+      expect(t.exportsPage.emptyDataWarning.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('translates the reports screen titles and demo-exists label', () => {
+    setLocale('vi');
+    expect(t.reports.titleMinutes).toBe('Biên bản họp lớp');
+    expect(t.classes.seedExists).toBe('Dữ liệu mẫu 8A đã có');
+    setLocale('en');
+    expect(t.reports.titleMinutes).toBe('Class meeting minutes');
+    expect(t.classes.seedExists).toBe('Demo data 8A already loaded');
+  });
+});
+
 describe('safe fallback', () => {
   it('falls back to Vietnamese for keys missing in English', () => {
     setLocale('en');
