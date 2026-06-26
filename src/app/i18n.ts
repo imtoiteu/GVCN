@@ -43,7 +43,7 @@ const vi = {
     minutes: 'Biên bản họp lớp',
     reports: 'Báo cáo tuần/tháng',
     exports: 'Xuất DOCX/PDF/XLSX',
-    claude: 'Claude Export',
+    claude: 'Xuất ẩn danh cho AI',
     settings: 'Cài đặt',
   },
 
@@ -241,6 +241,34 @@ const vi = {
     exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
   },
 
+  claudeExport: {
+    title: 'Xuất ẩn danh cho AI',
+    intro:
+      'Tạo bản tóm tắt đã ẩn danh (chỉ dùng mã ẩn danh S001, S002…) từ dữ liệu lớp để bạn tự sao chép vào Claude hoặc trợ lý AI khác. Ứng dụng KHÔNG tự gửi dữ liệu đi đâu; mọi thao tác là cục bộ và do bạn chủ động.',
+    classLabel: 'Lớp:',
+    periodKindLabel: 'Kỳ:',
+    kindWeek: 'Theo tuần',
+    kindMonth: 'Theo tháng',
+    weekLabel: 'Tuần:',
+    monthLabel: 'Tháng:',
+    toneLabel: 'Văn phong mong muốn:',
+    previewTitle: 'Xem trước nội dung đã ẩn danh',
+    copy: 'Sao chép vào bộ nhớ tạm',
+    copied: 'Đã sao chép',
+    copyFailed: 'Không sao chép được. Hãy bôi đen nội dung và sao chép thủ công.',
+    privacyTitle: 'Hãy kiểm tra trước khi sao chép',
+    privacyBody:
+      'Nội dung đã được ẩn danh tự động (loại bỏ tên, số điện thoại, email, địa chỉ, ngày sinh…), nhưng KHÔNG có công cụ nào hoàn hảo. Vui lòng đọc kỹ và tự chịu trách nhiệm trước khi sao chép sang bất kỳ công cụ AI bên ngoài nào. Tuyệt đối không dán nếu còn thấy thông tin nhận dạng thật.',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Hãy sang màn hình “Ghi nhận tuần” để tạo tuần và ghi nhận quan sát trước.',
+    noMonthTitle: 'Chưa nhóm được tháng nào',
+    noMonthHint: 'Các tuần cần có ngày bắt đầu để nhóm theo tháng. Hãy tạo tuần ở màn hình “Ghi nhận tuần”.',
+    noDataTitle: 'Chưa có ghi nhận để tóm tắt',
+    noDataHint: 'Kỳ này chưa có học sinh nào được ghi nhận. Hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
+  },
+
   gender: {
     male: 'Nam',
     female: 'Nữ',
@@ -288,7 +316,7 @@ const en: DeepPartial<Dict> = {
     minutes: 'Class meeting minutes',
     reports: 'Weekly/monthly reports',
     exports: 'Export DOCX/PDF/XLSX',
-    claude: 'Claude Export',
+    claude: 'Anonymized AI Export',
     settings: 'Settings',
   },
 
@@ -479,6 +507,34 @@ const en: DeepPartial<Dict> = {
     emptyListHint:
       'No comments/messages saved for this week yet. Please create and save them on the matching screen first, then come back here to export.',
     exportError: 'Could not export the file. Please try again in the desktop app.',
+  },
+
+  claudeExport: {
+    title: 'Anonymized AI Export',
+    intro:
+      'Create an anonymized summary (alias codes S001, S002… only) from your class data so you can copy it into Claude or another AI assistant yourself. The app does NOT send anything anywhere; everything is local and initiated by you.',
+    classLabel: 'Class:',
+    periodKindLabel: 'Period:',
+    kindWeek: 'By week',
+    kindMonth: 'By month',
+    weekLabel: 'Week:',
+    monthLabel: 'Month:',
+    toneLabel: 'Requested tone:',
+    previewTitle: 'Preview the anonymized content',
+    copy: 'Copy to clipboard',
+    copied: 'Copied',
+    copyFailed: 'Could not copy. Please select the text and copy it manually.',
+    privacyTitle: 'Review before copying',
+    privacyBody:
+      'The content is anonymized automatically (names, phone numbers, emails, addresses, birth dates… are removed), but no tool is perfect. Please read it carefully and take responsibility before copying it into any external AI tool. Do not paste it if you still see any real identifying information.',
+    noClassTitle: 'No classes yet',
+    noClassHint: 'Please go to the “Classes & Students” screen to load demo data 8A or import a list first.',
+    noWeekTitle: 'This class has no weeks yet',
+    noWeekHint: 'Please go to the “Weekly records” screen to create a week and record observations first.',
+    noMonthTitle: 'No months grouped yet',
+    noMonthHint: 'Weeks need a start date to group by month. Please create weeks on the “Weekly records” screen.',
+    noDataTitle: 'No records to summarize',
+    noDataHint: 'No students recorded for this period yet. Please record on the “Weekly records” screen first.',
   },
 
   gender: {

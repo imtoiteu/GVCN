@@ -101,4 +101,3 @@ end-to-end. The only outstanding work before a confident demo is the **single ma
 **M8 (plan) — Claude Export (anonymized):** `src/lib/export/anonymize.ts` single PII boundary +
 "Claude Export" screen → student-code-only summary to clipboard, gated by a no-PII test. Then
 **M9 — review/security skills pass** against SPEC §8 acceptance criteria for sign-off.
-</content>

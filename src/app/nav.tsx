@@ -13,6 +13,7 @@ import { CommentsPage } from '../features/comments/CommentsPage';
 import { ParentMessagesPage } from '../features/parent/ParentMessagesPage';
 import { ReportsPage } from '../features/reports/ReportsPage';
 import { ExportsPage } from '../features/exports/ExportsPage';
+import { ClaudeExportPage } from '../features/claude/ClaudeExportPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 export interface NavItem {
@@ -32,6 +33,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'minutes', render: () => <ReportsPage initialKind="minutes" /> },
   { id: 'reports', render: () => <ReportsPage initialKind="weekly" /> },
   { id: 'exports', render: () => <ExportsPage /> },
-  { id: 'claude', render: () => <PlaceholderPage navId="claude" /> },
+  { id: 'claude', render: () => <ClaudeExportPage /> },
   { id: 'settings', render: () => <PlaceholderPage navId="settings" /> },
 ];

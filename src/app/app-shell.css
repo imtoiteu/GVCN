@@ -289,6 +289,31 @@ body {
   color: #991b1b;
 }
 
+.state--warning {
+  background: #fff7ed;
+  border-color: #fcd9a5;
+  color: #92400e;
+}
+
+.privacy-warning p {
+  margin: 6px 0 0;
+}
+
+.claude-export__text {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  resize: vertical;
+  white-space: pre;
+}
+
 .state--success {
   background: var(--success-bg);
   border-color: var(--success-border);

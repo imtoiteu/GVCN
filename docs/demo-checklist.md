@@ -59,7 +59,14 @@ For **each** artifact (Biên bản · Báo cáo tuần · Báo cáo tháng · Da
 - [ ] **Close the app completely** and reopen (`npm run tauri dev` again, or relaunch the installed app).
 - [ ] Class 8A, its students, the recorded week (tags + notes), saved comments, parent messages, minutes, and reports are **all still present**.
 
-## 9. Safety spot-check
+## 9. Xuất ẩn danh cho AI (Anonymized AI Export)
+- [ ] Open **Xuất ẩn danh cho AI**, select class 8A + a recorded week (and try **Theo tháng**).
+- [ ] The privacy warning is visible above the preview.
+- [ ] Preview uses **aliases only** (`[S001]`, `[S002]`…) — **no real names, codes, phones, emails, addresses, or birth dates**. If a note had identifiers, they appear as `[… đã ẩn]` or a placeholder.
+- [ ] **Copy to clipboard** works (button shows "Đã sao chép"); paste into a text editor and re-confirm no real identifiers.
+- [ ] Switching tone / period regenerates the text; an empty period shows a safe message, not a crash.
+
+## 10. Safety spot-check
 - [ ] No screen sends data anywhere (offline the whole time; no network activity).
 - [ ] No surveillance/behavior-scoring framing; copy uses "ghi nhận / hỗ trợ / phối hợp / tiến bộ".
 - [ ] Exported filenames are ASCII slugs; exported text contains only fake demo data.
@@ -70,4 +77,3 @@ For **each** artifact (Biên bản · Báo cáo tuần · Báo cáo tháng · Da
 - Date / machine / OS: ____________________
 - Tester: ____________________
 - Pass / Fail (note any ✗ with the step number): ____________________
-</content>

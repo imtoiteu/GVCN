@@ -84,18 +84,30 @@
   - **Done (M7 session).** `src/lib/export/xlsx.ts` reuses **ExcelJS** (no new dep). Bold title/header rows + data; `unzip -t` clean and **round-tripped back through ExcelJS** in tests to confirm cell content. Verify: tests green ✅; opens-in-Excel is the manual step.
 - [x] **TDD** view-model + mapper structure tests
   - **Done (M7 session).** `+25` tests across `src/lib/export/__tests__/` (exportModel, zip+CRC vectors, docx XML+bytes, xlsx round-trip, printHtml). Verify: `npm run test` → **100 passed**; typecheck/build 0; `cargo check` Finished; `npm audit` 0. **"Xuất file" screen** (`src/features/exports/ExportsPage.tsx`) wired into the `exports` nav slot: class → artifact → week/month → preview → download DOCX/XLSX or In/Lưu PDF; empty/no-saved states are safe. **Runtime GUI smoke-check** (download + print wiring) pending a display. See `docs/m7-exports.md`.
-- [ ] **Checkpoint E (with M8):** all output paths work.
-  - **File paths DONE (M7):** DOCX/XLSX/PDF export wired + tested; Claude Export (M8) is the remaining output path.
+- [x] **Checkpoint E (with M8):** all output paths work.
+  - **DONE (M7 + M8.2):** file paths (DOCX/XLSX/PDF) wired + tested in M7; the Claude/AI output path
+    (anonymized, code-only, copy-to-clipboard) wired + no-PII-gated in M8.2. Every output path now
+    works and is anonymized where required. **Remaining:** the single runtime GUI pass on a display.
 
 ## M8 — Claude Export (anonymized) (TDD)
-> **Deferred during the M8 release-readiness session** (offered as optional there). It is the
-> product's highest-risk feature (PII → external paste); it gets its own focused TDD milestone
-> rather than being squeezed into a polish pass. "Claude Export" nav slot stays a placeholder.
-> See `docs/m8-demo-release-readiness.md` "Claude Export decision".
-- [ ] `lib/export/anonymize.ts` (single boundary) + Claude Export screen → clipboard
-  - Verify: summary copyable; codes only.
-- [ ] **No-PII test** (no name/phone/address/grade leaks)
-  - Verify: guard test green.
+> Deferred during the M8 release-readiness pass (highest-risk PII feature); **built in the M8.2
+> session** as its own focused, test-gated slice. See `docs/m8-2-claude-export-anonymized.md`.
+- [x] `lib/export/anonymize.ts` (single boundary) + Claude Export screen → clipboard
+  - **Done (M8.2).** `src/lib/export/anonymize.ts` = single PII boundary (layered redactors: email/
+    URL/date/phone/address/roster-name/generic-capitalized-name + `safeNote` placeholder + stable
+    `S001` aliases). `src/lib/export/claudeExport.ts` = pure deterministic Vietnamese export builder
+    (`buildAnonymizedExport`) — receives only aliases + controlled tag labels + scrubbed notes, so
+    real names never enter the text. `src/features/claude/ClaudeExportPage.tsx` wired into the
+    `claude` nav slot (label **Xuất ẩn danh cho AI** / **Anonymized AI Export**): class → week/month
+    → tone → preview → **Copy to clipboard**, with a privacy warning + safe empty states. No deps,
+    no network, nothing auto-sent. Verify: build/typecheck 0; `npm audit` 0. **Runtime GUI
+    smoke-check** (preview shows aliases only; copy works) pending a display.
+- [x] **No-PII test** (no name/phone/address/grade leaks)
+  - **Done (M8.2).** `__tests__/anonymize.test.ts` (+13) + `__tests__/claudeExport.test.ts` (+9)
+    assert: student/parent names, phones, emails, addresses, birth dates removed; aliases stable &
+    name-independent; built export contains none of the original names; all-PII note → placeholder;
+    **`fetch` stubbed & asserted never called**; vi+en labels exist; deterministic; safe empty export.
+    Verify: `npm run test` → **132 passed** (+22). ✅
 
 ## M9 — Polish · review · security
 - [~] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y

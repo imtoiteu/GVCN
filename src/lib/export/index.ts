@@ -9,4 +9,6 @@ export * from './docx';
 export * from './xlsx';
 export * from './printHtml';
 export * from './download';
+export * from './anonymize';
+export * from './claudeExport';
 export { crc32, zipStore } from './zip';
