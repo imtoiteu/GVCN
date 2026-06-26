@@ -218,7 +218,7 @@ fill the gaps. Each: brief tradeoff, then one choice.
 ### 10.2 DOCX / PDF / XLSX export
 - **DOCX → `docxtemplater`.** Tradeoff: `docx` (programmatic) keeps layout in TS but non-devs can't tweak it; `docxtemplater` drives hand-editable `.docx` templates with `{placeholders}` — ideal for a teacher-owned template in `templates/`. **Choice: docxtemplater (free core).**
 - **PDF → webview print-to-PDF from a print-friendly HTML route.** Tradeoff: `pdfmake` gives programmatic layout but you re-author every report in JS and must bundle Vietnamese fonts; the webview already renders Vietnamese correctly and "Save as PDF" is built in. **Choice: print-to-PDF for MVP; revisit `pdfmake` only if pixel-exact automation is needed.**
-- **XLSX → `SheetJS` (xlsx).** Used for both import and export (round-trip). Tradeoff: heavier than hand-rolling CSV, but handles real `.xlsx`, diacritics, and multiple sheets. Note licensing: pin a known-good community edition and record it in `source-driven-development` notes. **Choice: SheetJS.**
+- **XLSX → `SheetJS` (xlsx).** Used for both import and export (round-trip). Tradeoff: heavier than hand-rolling CSV, but handles real `.xlsx`, diacritics, and multiple sheets. Note licensing: pin a known-good community edition and record it in `source-driven-development` notes. **Choice: SheetJS.** **Update (M2): switched to `exceljs@^4.4.0`** — npm `xlsx@0.18.5` carried two unpatched high-severity advisories; see `docs/m2-excel-import.md` (Risk #6 resolved).
 
 ### 10.3 Table / form / dashboard UI → **shadcn/ui (Radix + Tailwind) + TanStack Table + React Hook Form + Zod**
 - **Tradeoff:** A component library (MUI/AntD) is faster to drop in but heavier and harder to restyle for Vietnamese print layouts; shadcn/ui is copy-in, fully ownable, and matches the `shadcn-admin` reference patterns we're adapting. TanStack Table handles roster sorting/filtering; React Hook Form + Zod give declarative validation for record entry and import.
@@ -285,7 +285,7 @@ tests/ or *.test.ts colocated → Vitest
 | 3 | Vietnamese grading/observation taxonomy not finalized. | Medium | MVP seeds a small tag catalog; confirm categories/labels with the teacher before M3. |
 | 4 | "Week" vs "month" reporting: monthly report derived by grouping weeks vs separate period entity. | Medium | Default: derive monthly from weeks; revisit if teachers track months independently. |
 | 5 | DOCX template ownership/format (who authors the official "GVCN giỏi" template). | Medium | MVP ships a generic template in `templates/`; real template to be supplied later. |
-| 6 | SheetJS licensing/edition to pin. | Low | Record chosen edition + version under `source-driven-development` notes in M2. |
+| 6 | SheetJS licensing/edition to pin. | Low | **Resolved (M2):** dropped SheetJS (2 high unpatched advisories) for `exceljs@^4.4.0`; see `docs/m2-excel-import.md`. |
 | 7 | PDF fidelity via webview print may vary by OS print dialog. | Low | Acceptable for MVP; `pdfmake` is the documented fallback. |
 | 8 | No multi-class bulk operations specified. | Low | Out of MVP; one class at a time. |
 

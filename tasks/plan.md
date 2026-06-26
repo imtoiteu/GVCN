@@ -43,7 +43,7 @@ Replace scaffold demo with an app shell and wire the core libraries.
 - **Verify:** create a class, add/edit students, load demo 8A → roster renders; data persists across restart. Component tests for empty/loading states.
 
 ### M2 — Excel import `[Medium]`
-- SheetJS import: file dialog → parse `.xlsx` → Zod-validate rows → preview with per-row errors → commit valid rows.
+- ~~SheetJS~~ **ExcelJS** import (switched for security — see `docs/m2-excel-import.md`): file picker → parse `.xlsx` → Zod-validate rows → preview with per-row errors → commit valid rows.
 - **TDD:** parser/mapper unit tests (valid file, missing columns, bad/blank rows, diacritics, dedupe by `student_code`).
 - **Verify:** import a fixture `.xlsx`; invalid rows flagged + skipped, valid rows imported. Record SheetJS edition/version (Risk #6).
 

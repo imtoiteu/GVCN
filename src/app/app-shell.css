@@ -1,0 +1,271 @@
+/* App shell layout + thin component styling. Plain CSS (no Tailwind yet) to avoid adding
+   a styling dependency for this bridging milestone. */
+
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --border: #e3e6ea;
+  --text: #1f2933;
+  --muted: #6b7280;
+  --primary: #2563eb;
+  --primary-text: #ffffff;
+  --sidebar-bg: #1f2a3a;
+  --sidebar-text: #d7dee8;
+  --sidebar-active: #2563eb;
+  --error-bg: #fef2f2;
+  --error-border: #fca5a5;
+  --success-bg: #f0fdf4;
+  --success-border: #86efac;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* --- sidebar --- */
+.shell__sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 16px 12px;
+  gap: 16px;
+}
+
+.shell__brand {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.shell__brand-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.shell__brand-subtitle {
+  font-size: 12px;
+  color: var(--sidebar-text);
+  opacity: 0.7;
+}
+
+.shell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.shell__nav-item {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--sidebar-text);
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.shell__nav-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.shell__nav-item--active {
+  background: var(--sidebar-active);
+  color: #fff;
+  font-weight: 600;
+}
+
+.shell__offline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.8;
+  padding: 8px;
+}
+
+.shell__offline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+}
+
+/* --- content --- */
+.shell__content {
+  padding: 28px 32px;
+  overflow: auto;
+}
+
+.page {
+  max-width: 960px;
+}
+
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.page__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* --- toolbar / fields / buttons --- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field__input {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #f3f4f6;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+.btn--primary:hover {
+  background: #1d4ed8;
+}
+
+.btn--file {
+  cursor: pointer;
+}
+
+/* --- table --- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table--errors td {
+  color: #b91c1c;
+}
+
+/* --- states --- */
+.state {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 20px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.state h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.state--empty {
+  color: var(--muted);
+}
+
+.state--error {
+  background: var(--error-bg);
+  border-color: var(--error-border);
+  color: #991b1b;
+}
+
+.state--success {
+  background: var(--success-bg);
+  border-color: var(--success-border);
+  color: #166534;
+}

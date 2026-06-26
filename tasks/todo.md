@@ -10,8 +10,8 @@
   - **Partial:** `typecheck` (`tsc --noEmit`) + `test` (`vitest run`) added & passing; Vitest configured (`vitest.config.ts`, node env). `lint`/ESLint still deferred to a UI milestone. Verify: `npm run typecheck` → 0; `npm run test` → 15 passed. ✅
 - [x] Fix `tauri.conf.json` `identifier` → `vn.gvcn.autoreport` (Risk #1); window → 1200×800 (Risk #2)
   - **Done.** Valid JSON confirmed; `npm run build` + `cargo check` + release bundle pass with this identifier. Window *sizing* still needs a GUI display to eyeball (`tauri dev`); config is correct. See `docs/m0-scaffold-check.md`.
-- [ ] App shell: sidebar + routing for 12 screens (SPEC §4); class-switcher placeholder
-  - Verify: each route renders a stub; nav works.
+- [~] App shell: sidebar + routing for 12 screens (SPEC §4); class-switcher placeholder
+  - **Shell done (M2.5 bridging session).** `src/app/AppShell.tsx` + `nav.tsx`: Vietnamese sidebar listing all 12 SPEC §4 screens, app title, offline indicator, in-memory page switcher (no router dep yet). 2 screens functional (Lớp & Học sinh, Nhập từ Excel); other 10 are placeholder stubs. Verify: `npm run build`/`typecheck` → 0; each nav item renders. **Deferred:** real router + shadcn/Tailwind UI stack; runtime GUI nav smoke-check (needs a display). See `docs/m2-5-app-shell-import-ui.md`.
 - [x] SQLite plugin + capabilities; migration runner; create schema (SPEC §5); seed tag catalog
   - **Done + Rust-verified on Linux (Checkpoint A).** `tauri-plugin-sql` (sqlite) registered in `src-tauri/src/lib.rs` with migrations `001_init.sql` + `002_seed_tags.sql`; `sql:*` perms in `capabilities/default.json`. Schema tested via better-sqlite3 (9 tables, FK/UNIQUE/CHECK/CASCADE); 22-tag catalog seeded + idempotent. `cargo check` → 0; `tauri-plugin-sql v2.4.0`/`sqlx-sqlite` in tree; release `.deb`/`.rpm` binary embeds the migrations. See `docs/m1-data-layer.md`.
 - [x] Thin typed DAL skeleton in `src/lib/db`
@@ -25,19 +25,19 @@
 - [ ] Student CRUD + roster table (TanStack Table, RHF+Zod)
   - Verify: add/edit student; table sorts/filters.
 - [~] Load demo class 8A (fake students, no PII)
-  - **Data layer done (M1 session):** `seedDemoClass()` + fake 8A roster (12 students, codes `8A-NN`) + 2 demo weeks in `src/lib/db/seed.ts`; idempotent; tested. **UI one-click trigger still pending** (needs app shell/Classes screen). Verify: `npm run test` seed tests pass. ✅
+  - **Data layer done (M1 session):** `seedDemoClass()` + fake 8A roster (12 students, codes `8A-NN`) + 2 demo weeks in `src/lib/db/seed.ts`; idempotent; tested. **UI one-click trigger now wired (M2.5):** Classes page "Tải dữ liệu mẫu 8A" button calls `seedDemoClass` then renders the roster table. Verify: `npm run test` seed tests pass ✅; build/typecheck 0. **Runtime GUI smoke-check** (button creates rows in `sqlite:gvcn.db`, persists across restart) still pending a display.
 - [ ] Empty/loading states for classes + students
   - Verify: RTL component tests.
 
 ## M2 — Excel import
-- [~] SheetJS import: dialog → parse → Zod-validate → preview w/ row errors → commit
-  - **Engine DONE, screen deferred.** `src/lib/import/`: `readStudentSheet` (exceljs) → `parseStudentRows` (pure Zod-validate/map/dedupe → `valid`/`errors[]`/`totalRows`) → `commitStudentImport` (reuses M1 DAL, skips existing). Accepts raw file bytes so it's runtime-source-agnostic. **Deferred:** the Tauri file-dialog + Students import-preview screen (needs the M0 app shell + a GUI). See `docs/m2-excel-import.md`.
+- [x] ~~SheetJS~~ **ExcelJS** import: file picker → parse → Zod-validate → preview w/ row errors → commit
+  - **Engine + screen DONE.** Engine (M2): `src/lib/import/` `readStudentSheet` (exceljs) → `parseStudentRows` (pure Zod-validate/map/dedupe → `valid`/`errors[]`/`totalRows`) → `commitStudentImport` (reuses M1 DAL, skips existing); accepts raw bytes. Screen (M2.5): `src/features/import/ImportPage.tsx` — native `<input type="file">` → `file.arrayBuffer()` → preview table + row-error table → commit into a selected class → inserted/skipped summary. No Tauri dialog plugin needed (works in webview + dev server). Verify: build/typecheck 0; engine tests 6 ✅. **Runtime GUI smoke-check** of a real `.xlsx` through the webview still pending a display. See `docs/m2-5-app-shell-import-ui.md`.
 - [x] **TDD** parser/mapper tests (missing cols, blank/bad rows, diacritics, dedupe by `student_code`)
   - **Done.** 6 tests over real `.xlsx` round-trips (VN + English headers, diacritics intact, gender map, missing column/value, in-file dedupe, demo+import commit). Verify: `npm run test` → 21 passed. ✅
 - [x] Record SheetJS edition/version (Risk #6)
   - **Done — and changed the choice.** npm `xlsx@0.18.5` had 2 *high* unpatched advisories (prototype pollution + ReDoS); fixes only on SheetJS CDN. Per user directive (safer/maintainable, no CDN) switched to **`exceljs@^4.4.0`** (MIT, npm) + `zod@^3`; pinned `uuid ^11.1.1` via `overrides` → `npm audit` 0. Recorded in `docs/m2-excel-import.md`.
 - [~] **Checkpoint B:** roster buildable via demo + import; tests green.
-  - **Logic DONE:** `seedDemoClass` + import commit → roster built (12 demo + 2 imported, 1 skipped); tests green. **UI half deferred** with the import screen above.
+  - **Logic + UI DONE (M2.5):** `seedDemoClass` + import commit → roster built (12 demo + 2 imported, 1 skipped); tests green. Classes + Import screens now drive this path through the UI. **Remaining:** a single runtime GUI run (seed 8A → import a fixture `.xlsx` → see roster grow) on a machine with a display.
 
 ## M3 — Weekly records + tag catalog
 - [ ] Confirm tag taxonomy with teacher (Risk #3)
