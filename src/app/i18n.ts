@@ -104,7 +104,53 @@ export const t = {
     savedSummary: (n: number) => `Đã lưu ${n} nhận xét cho tuần này.`,
     nothingToSave: 'Chưa có nhận xét nào để lưu.',
   },
+
+  parent: {
+    title: 'Tin nhắn phụ huynh',
+    intro:
+      'Chọn lớp và tuần đã ghi nhận. Ứng dụng tạo bản nháp tin nhắn tiếng Việt gửi phụ huynh, mang tính phối hợp và tôn trọng. Đây chỉ là bản nháp để bạn chỉnh sửa rồi tự gửi; ứng dụng không gửi tin nhắn ra ngoài.',
+    classLabel: 'Lớp:',
+    weekLabel: 'Tuần:',
+    typeLabel: 'Loại tin nhắn:',
+    typeAuto: 'Tự động theo ghi nhận',
+    typePraise: 'Khen ngợi / cập nhật tích cực',
+    typeReminder: 'Nhắc nhở nhẹ nhàng',
+    typeCooperation: 'Đề nghị phối hợp',
+    typeSupport: 'Theo dõi & hỗ trợ',
+    regenerate: 'Tạo lại tin nhắn',
+    save: 'Lưu tin nhắn',
+    saving: 'Đang lưu…',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Hãy sang màn hình “Ghi nhận tuần” để tạo tuần và ghi nhận quan sát trước.',
+    noRecords: 'Tuần này chưa có học sinh nào được ghi nhận. Hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
+    savedBadge: 'đã lưu',
+    warnBanned: (phrases: string) =>
+      `Lưu ý: tin nhắn có chứa từ ngữ nên tránh (${phrases}). Hãy chỉnh lại cho nhẹ nhàng, mang tính phối hợp.`,
+    savedSummary: (n: number) => `Đã lưu ${n} tin nhắn phụ huynh cho tuần này.`,
+    nothingToSave: 'Chưa có tin nhắn nào để lưu.',
+  },
 } as const;
+
+/** Parent-message type as picked in the UI ('auto' lets the generator derive it per student). */
+export type ParentTypeChoice = 'auto' | 'praise' | 'reminder' | 'cooperation' | 'support';
+
+/** Vietnamese label for a parent-message type choice. */
+export function parentTypeLabel(choice: ParentTypeChoice): string {
+  switch (choice) {
+    case 'praise':
+      return t.parent.typePraise;
+    case 'reminder':
+      return t.parent.typeReminder;
+    case 'cooperation':
+      return t.parent.typeCooperation;
+    case 'support':
+      return t.parent.typeSupport;
+    default:
+      return t.parent.typeAuto;
+  }
+}
 
 /** Vietnamese label for a comment tone. */
 export function toneLabel(tone: 'short' | 'balanced' | 'encouraging'): string {

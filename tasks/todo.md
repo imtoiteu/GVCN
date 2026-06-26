@@ -58,10 +58,10 @@
   - **Logic + UI done (M4 session).** `src/features/comments/CommentsPage.tsx`: choose class+week → read M3 records via DAL → generate per-student (tone selector) → editable preview → save via `createComment`; prefill latest via new DAL `listLatestCommentsByWeek` (`+2` tests). Verify: build/typecheck 0; tests green. **Runtime GUI smoke-check** (generate→edit→save→reopen prefilled) pending a display. See `docs/m4-comment-generation.md`.
 
 ## M5 — Parent-message generation (TDD)
-- [ ] **TDD** `lib/generate/parentMessage.ts`: cooperative, non-accusatory draft (tone tests + banned-phrase guard)
-  - Verify: unit tests green.
-- [ ] Parent Messages screen: generate → edit → save
-  - Verify: draft saved + reloads.
+- [x] **TDD** `lib/generate/parentMessage.ts`: cooperative, non-accusatory draft (tone tests + banned-phrase guard)
+  - **Done (M5 session).** Pure deterministic generator: greeting → opening → tag details (positive/neutral/concern/support) → free-text note/comment → cooperative closing → thanks. 4 message types (praise/reminder/cooperation/support), default derived from tags by priority. Concern framed as a *shared, gentle* reminder, never blame. **Reuses M4 `findBannedPhrases`** (single guard source); self-asserts controlled output is banned-free. `+13` TDD tests incl. a non-accusatory-tone guard (every tag×type message matches `phối hợp|đồng hành|mong|cảm ơn` and is banned-free). Verify: `npm run test` → **55 passed**; typecheck/build 0. See `docs/m5-parent-message-generation.md`.
+- [x] Parent Messages screen: generate → edit → save
+  - **Logic + UI done (M5 session).** `src/features/parent/ParentMessagesPage.tsx`: choose class+week → read M3 records via DAL + latest M4 comments as fallback context → generate per-student (type selector incl. "Tự động") → editable preview → save via `createParentMessage`; prefill latest via new DAL `listLatestParentMessagesByWeek` (`+2` tests). **Drafts only — no SMS/Zalo/email send.** Verify: build/typecheck 0; tests green. **Runtime GUI smoke-check** (generate→edit→save→reopen prefilled) pending a display. See `docs/m5-parent-message-generation.md`.
 
 ## M6 — Meeting minutes + weekly/monthly reports (TDD)
 - [ ] **TDD** aggregation: minutes (week/class)

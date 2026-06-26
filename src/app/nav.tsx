@@ -10,6 +10,7 @@ import { ClassesPage } from '../features/classes/ClassesPage';
 import { ImportPage } from '../features/import/ImportPage';
 import { WeeklyRecordPage } from '../features/weekly/WeeklyRecordPage';
 import { CommentsPage } from '../features/comments/CommentsPage';
+import { ParentMessagesPage } from '../features/parent/ParentMessagesPage';
 import { PlaceholderPage } from './pages/PlaceholderPage';
 
 export interface NavItem {
@@ -25,7 +26,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'import', label: 'Nhập từ Excel', render: () => <ImportPage /> },
   { id: 'weekly', label: 'Ghi nhận tuần', render: () => <WeeklyRecordPage /> },
   { id: 'comments', label: 'Nhận xét học sinh', render: () => <CommentsPage /> },
-  { id: 'parent', label: 'Tin nhắn phụ huynh', render: () => <PlaceholderPage title="Tin nhắn phụ huynh" /> },
+  { id: 'parent', label: 'Tin nhắn phụ huynh', render: () => <ParentMessagesPage /> },
   { id: 'minutes', label: 'Biên bản họp lớp', render: () => <PlaceholderPage title="Biên bản họp lớp" /> },
   { id: 'reports', label: 'Báo cáo tuần/tháng', render: () => <PlaceholderPage title="Báo cáo tuần/tháng" /> },
   { id: 'exports', label: 'Xuất DOCX/PDF/XLSX', render: () => <PlaceholderPage title="Xuất DOCX/PDF/XLSX" /> },

@@ -323,6 +323,28 @@ export function listParentMessagesByStudent(
   );
 }
 
+/**
+ * The latest saved parent message per student for a given week (one row per student), so the
+ * "Tin nhắn phụ huynh" screen can prefill previously reviewed drafts. createParentMessage always
+ * inserts a new row, so "latest" = max(id) within the week.
+ */
+export function listLatestParentMessagesByWeek(
+  exec: SqlExecutor,
+  weekId: number,
+): Promise<ParentMessageRow[]> {
+  return exec.select<ParentMessageRow>(
+    `SELECT pm.* FROM parent_messages pm
+       JOIN (
+         SELECT student_id, MAX(id) AS max_id
+           FROM parent_messages
+          WHERE week_id = ?
+          GROUP BY student_id
+       ) latest ON latest.max_id = pm.id
+      ORDER BY pm.student_id ASC`,
+    [weekId],
+  );
+}
+
 export function createReport(
   exec: SqlExecutor,
   r: {
