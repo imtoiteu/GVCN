@@ -79,7 +79,44 @@ export const t = {
     selectedCount: (n: number) => `${n} nhãn đã chọn`,
     weekName: (no: number) => `Tuần ${no}`,
   },
+
+  comments: {
+    title: 'Tạo nhận xét học sinh',
+    intro:
+      'Chọn lớp và tuần đã ghi nhận. Ứng dụng tạo nhận xét tiếng Việt từ các nhãn và ghi chú của tuần đó. Bạn có thể chỉnh sửa trước khi lưu. Nhận xét được tạo cục bộ trên máy, không gửi ra ngoài.',
+    classLabel: 'Lớp:',
+    weekLabel: 'Tuần:',
+    toneLabel: 'Văn phong:',
+    toneShort: 'Ngắn gọn',
+    toneBalanced: 'Cân đối',
+    toneEncouraging: 'Động viên',
+    regenerate: 'Tạo lại nhận xét',
+    save: 'Lưu nhận xét',
+    saving: 'Đang lưu…',
+    noClassTitle: 'Chưa có lớp nào',
+    noClassHint: 'Hãy sang màn hình “Lớp & Học sinh” để tải dữ liệu mẫu 8A hoặc nhập danh sách trước.',
+    noWeekTitle: 'Lớp này chưa có tuần nào',
+    noWeekHint: 'Hãy sang màn hình “Ghi nhận tuần” để tạo tuần và ghi nhận quan sát trước.',
+    noRecords: 'Tuần này chưa có học sinh nào được ghi nhận. Hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
+    editedBadge: 'đã lưu',
+    warnBanned: (phrases: string) =>
+      `Lưu ý: nhận xét có chứa từ ngữ nên tránh (${phrases}). Hãy chỉnh lại cho nhẹ nhàng, mang tính hỗ trợ.`,
+    savedSummary: (n: number) => `Đã lưu ${n} nhận xét cho tuần này.`,
+    nothingToSave: 'Chưa có nhận xét nào để lưu.',
+  },
 } as const;
+
+/** Vietnamese label for a comment tone. */
+export function toneLabel(tone: 'short' | 'balanced' | 'encouraging'): string {
+  switch (tone) {
+    case 'short':
+      return t.comments.toneShort;
+    case 'encouraging':
+      return t.comments.toneEncouraging;
+    default:
+      return t.comments.toneBalanced;
+  }
+}
 
 /** Display a stored gender code (M/F or null) as Vietnamese. */
 export function genderLabel(gender: string | null): string {

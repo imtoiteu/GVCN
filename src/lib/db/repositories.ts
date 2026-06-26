@@ -279,6 +279,28 @@ export function listCommentsByStudent(
   );
 }
 
+/**
+ * The latest saved comment per student for a given week (one row per student), so the
+ * "Tạo nhận xét" screen can prefill previously reviewed comments. createComment always inserts
+ * a new row, so "latest" = max(id) within the week.
+ */
+export function listLatestCommentsByWeek(
+  exec: SqlExecutor,
+  weekId: number,
+): Promise<GeneratedCommentRow[]> {
+  return exec.select<GeneratedCommentRow>(
+    `SELECT gc.* FROM generated_comments gc
+       JOIN (
+         SELECT student_id, MAX(id) AS max_id
+           FROM generated_comments
+          WHERE week_id = ?
+          GROUP BY student_id
+       ) latest ON latest.max_id = gc.id
+      ORDER BY gc.student_id ASC`,
+    [weekId],
+  );
+}
+
 export function createParentMessage(
   exec: SqlExecutor,
   m: { student_id: number; week_id?: number | null; body_text: string; edited_by_user?: boolean },

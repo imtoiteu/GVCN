@@ -50,12 +50,12 @@
   - **Logic + UI done (M3 session):** the full loop (seed/import roster → create/select week → tag + note per student → save → reload) is wired and unit-tested. **Remaining:** a single runtime GUI run on a machine with a display (`npm run tauri dev`) to confirm persistence across restart.
 
 ## M4 — Comment generation (TDD)
-- [ ] **TDD** `lib/generate/comment.ts`: tags+notes → Vietnamese comment (sentiment balance, empty fallback)
-  - Verify: unit tests green.
-- [ ] **No-banned-phrase guard** test (no punitive/stigmatizing words)
-  - Verify: guard test green.
-- [ ] Comments screen: generate → edit → save to `generated_doc`
-  - Verify: editable comment saved + reloads.
+- [x] **TDD** `lib/generate/comment.ts`: tags+notes → Vietnamese comment (sentiment balance, empty fallback)
+  - **Done (M4 session).** Pure deterministic generator: positive/neutral/concern/support segments + teacher note + 3 tones (short/balanced/encouraging); concern framed as support; empty-record fallback. `+13` TDD tests. Verify: `npm run test` → **40 passed**; typecheck/build 0. See `docs/m4-comment-generation.md`.
+- [x] **No-banned-phrase guard** test (no punitive/stigmatizing words)
+  - **Done (M4 session).** `findBannedPhrases` matches punitive VN phrasing on whole syllable tokens (no `như`/`hư` false-positives); generator self-asserts its controlled output is clean; screen warns on edited text. Tests assert every generated comment across all tags/tones is banned-free. Verify: guard tests green.
+- [x] Comments screen: generate → edit → save to `generated_comments`
+  - **Logic + UI done (M4 session).** `src/features/comments/CommentsPage.tsx`: choose class+week → read M3 records via DAL → generate per-student (tone selector) → editable preview → save via `createComment`; prefill latest via new DAL `listLatestCommentsByWeek` (`+2` tests). Verify: build/typecheck 0; tests green. **Runtime GUI smoke-check** (generate→edit→save→reopen prefilled) pending a display. See `docs/m4-comment-generation.md`.
 
 ## M5 — Parent-message generation (TDD)
 - [ ] **TDD** `lib/generate/parentMessage.ts`: cooperative, non-accusatory draft (tone tests + banned-phrase guard)
