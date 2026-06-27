@@ -32,7 +32,9 @@ body {
 .shell {
   display: grid;
   grid-template-columns: 240px 1fr;
-  min-height: 100vh;
+  /* Fill the viewport exactly so only the content column scrolls (the sidebar stays put). */
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* --- sidebar --- */
@@ -43,6 +45,8 @@ body {
   color: var(--sidebar-text);
   padding: 16px 12px;
   gap: 16px;
+  /* Keep navigation usable even in short windows: the sidebar itself scrolls if needed. */
+  overflow-y: auto;
 }
 
 .shell__brand {
@@ -133,17 +137,21 @@ body {
   background: #34d399;
 }
 
+/* Copyright sits in the brand block (top of the sidebar) so it stays visible in small windows. */
 .shell__copyright {
-  padding: 6px 8px 2px;
+  margin-top: 6px;
   font-size: 11px;
   line-height: 1.4;
+  color: var(--sidebar-text);
   opacity: 0.6;
 }
 
 /* --- content --- */
 .shell__content {
   padding: 28px 32px;
-  overflow: auto;
+  /* min-height:0 lets this grid cell shrink below content size so it (not the page) scrolls. */
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .page {
@@ -656,4 +664,66 @@ body {
 
 .help-card__notice--error {
   color: #b91c1c;
+}
+
+/* ---- PDF print mode (M9.2c) -------------------------------------------------
+   "In / Lưu PDF" switches the Exports page into a top-level print preview rendered
+   in the main window, then calls window.print(). @media print hides the app chrome
+   so only .print-document reaches the paper / "Save as PDF". A hidden-iframe print
+   silently no-ops in the macOS Tauri webview, so we print the top-level window. */
+.print-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #fff;
+  overflow: auto;
+  padding: 24px 24px 48px;
+}
+
+.print-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  max-width: 800px;
+  margin: 0 auto 16px;
+}
+
+.print-toolbar__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.print-toolbar__hint {
+  margin: 0;
+  font-size: 13px;
+  color: #475569;
+  flex: 1 1 240px;
+}
+
+.print-document {
+  max-width: 800px;
+  margin: 0 auto;
+  color: #111;
+}
+
+@media print {
+  /* Print only the export document: hide everything, reveal the print area. */
+  body * {
+    visibility: hidden;
+  }
+  .print-overlay,
+  .print-overlay * {
+    visibility: visible;
+  }
+  .print-overlay {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    overflow: visible;
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
 }

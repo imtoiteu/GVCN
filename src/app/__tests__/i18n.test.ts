@@ -92,7 +92,9 @@ describe('M9.2 export-save / Excel-format / copyright keys', () => {
       // export save feedback + PDF hint
       expect(t.exportsPage.saved('a.docx')).toContain('a.docx');
       expect(t.exportsPage.printHint.length).toBeGreaterThan(0);
-      expect(t.exportsPage.printError.length).toBeGreaterThan(0);
+      expect(t.exportsPage.printNow.length).toBeGreaterThan(0);
+      expect(t.exportsPage.printBack.length).toBeGreaterThan(0);
+      expect(t.exportsPage.printFallback).toContain('Cmd+P');
       // Excel-format help block
       expect(t.importPage.format.title.length).toBeGreaterThan(0);
       expect(t.importPage.format.colCode.length).toBeGreaterThan(0);

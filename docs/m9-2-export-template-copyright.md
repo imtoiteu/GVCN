@@ -50,22 +50,27 @@ on the MacBook.
 `cargo check` passes. The packaged app must be **rebuilt on the MacBook** (`npm run tauri build` /
 `.dmg`) for the new plugin + capability to take effect — the VPS does not run the packaging step.
 
-## PDF behavior (print-based; popup → iframe fix)
+## PDF behavior (print-based; top-level print mode)
 
 PDF stays a **print-to-PDF** flow (system print dialog → "Save as PDF"), button label "In / Lưu PDF"
-/ "Print / Save PDF". Two issues were fixed so it no longer shows the generic DOCX/XLSX error:
+/ "Print / Save PDF". It never touches the binary save path, so it cannot raise the DOCX/XLSX error.
+The mechanism was iterated to be reliable in the macOS Tauri webview:
 
-- **Cause:** `openPrintHtml` opened the print document with `window.open('', '_blank')`. The macOS
-  Tauri webview (WKWebView) **blocks popups**, so `window.open` returned `null`, `openPrintHtml`
-  threw, and the shared `catch` in `doExport` surfaced it as *"Không xuất được tệp…"* — the DOCX/XLSX
-  message — even though PDF never touches the binary save path.
-- **Fix:** `openPrintHtml` now prints via a **hidden iframe** (`srcdoc` + `contentWindow.print()`),
-  which works inside WKWebView and the browser without any popup. PDF is handled by a separate
-  `doPrintPdf` (not `doExport`), so a print failure shows a **PDF-specific** message
-  (`exportsPage.printError`: "Không mở được hộp thoại in tự động… dùng Cmd+P/Ctrl+P hoặc xuất DOCX").
-- Help line (`exportsPage.printHint`) reads "PDF sử dụng hộp thoại in của hệ thống. Chọn 'Lưu thành
-  PDF' trong hộp thoại in." / "PDF uses the system print dialog. Choose 'Save as PDF'…". No PDF
-  library, no new dependency, no Tauri/Rust/capability change.
+- **First attempt (popup):** `window.open('', '_blank')` returned `null` in WKWebView (popups
+  blocked) → threw → the shared `catch` showed the generic export error.
+- **Second attempt (hidden iframe):** `srcdoc` + `iframe.contentWindow.print()` — no error, but in
+  the macOS Tauri webview it **silently no-ops** (no dialog, no error).
+- **Current fix (top-level print mode, M9.2c):** clicking the button sets `printMode`, which renders
+  a clean **print overlay** in the main window (`.print-overlay` → `ExportPreview`) and calls
+  **`window.print()` on the top-level window** (after a double `requestAnimationFrame` so the print
+  DOM is ready; guarded by a ref so it fires once). `@media print` hides the sidebar/app controls
+  (`body * { visibility: hidden }` → reveal `.print-overlay`) so only the document prints. The
+  overlay shows **In ngay / Print now**, **Quay lại / Back**, and a visible fallback
+  (`printFallback`: "Nếu hộp thoại in không tự mở, nhấn Cmd+P / Ctrl+P… chọn 'Lưu thành PDF'").
+- Help line (`printHint`) reads "PDF sử dụng hộp thoại in của hệ thống. Chọn 'Lưu thành PDF' trong
+  hộp thoại in." / "PDF uses the system print dialog. Choose 'Save as PDF'…". No PDF library, no new
+  dependency, no Tauri/Rust/capability change. (`modelToPrintHtml` is retained but no longer used by
+  the page; the on-screen `ExportPreview` is printed directly.)
 
 ## Excel import template + format guide
 

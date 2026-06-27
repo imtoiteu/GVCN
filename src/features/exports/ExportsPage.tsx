@@ -9,7 +9,7 @@
 // generated and saved on those screens, so exports reflect their reviewed, edited wording. Nothing
 // is sent anywhere; saving uses a local Blob download (no Tauri fs/dialog plugin).
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { getDb } from '../../lib/db/tauri';
 import {
   listClasses,
@@ -30,9 +30,7 @@ import {
   XLSX_MIME,
   saveBytes,
   modelToDocx,
-  modelToPrintHtml,
   modelToXlsx,
-  openPrintHtml,
   type ExportModel,
 } from '../../lib/export';
 import {
@@ -106,7 +104,7 @@ export function ExportsPage() {
   const [emptyData, setEmptyData] = useState(false);
   const [busy, setBusy] = useState(false);
   const [exportErr, setExportErr] = useState(false);
-  const [pdfErr, setPdfErr] = useState(false);
+  const [printMode, setPrintMode] = useState(false);
   const [savedName, setSavedName] = useState<string | null>(null);
 
   const className = classes.find((c) => c.id === classId)?.name ?? '';
@@ -125,7 +123,7 @@ export function ExportsPage() {
       setEmptyList(false);
       setEmptyData(false);
       setExportErr(false);
-      setPdfErr(false);
+      setPrintMode(false);
       setSavedName(null);
 
       if (p.artifact === 'monthlyReport') {
@@ -282,17 +280,33 @@ export function ExportsPage() {
     [classId, className, artifact, weekId, monthKey, time, weeks, months, rebuild],
   );
 
-  // PDF is print-based (system print dialog → "Save as PDF"); it never uses the binary
-  // save/download path, and a print failure shows a PDF-specific message — not the DOCX/XLSX error.
+  // PDF is print-based: switch the app into a top-level print mode (a clean preview rendered in
+  // the main window) and let the user "Save as PDF" in the system print dialog. We print the
+  // top-level window (not a hidden iframe, which silently no-ops in the macOS Tauri webview); the
+  // `@media print` rules hide the sidebar/controls so only the document prints. It never touches
+  // the binary save/download path, so it cannot raise the DOCX/XLSX export error.
   const doPrintPdf = useCallback(() => {
     if (!model) return;
-    setPdfErr(false);
-    try {
-      openPrintHtml(modelToPrintHtml(model));
-    } catch {
-      setPdfErr(true);
-    }
+    setExportErr(false);
+    setPrintMode(true);
   }, [model]);
+
+  const closePrint = useCallback(() => setPrintMode(false), []);
+
+  // Avoid re-firing the print dialog on unrelated re-renders while print mode stays open.
+  const printedRef = useRef(false);
+  useEffect(() => {
+    if (!printMode) {
+      printedRef.current = false;
+      return;
+    }
+    if (printedRef.current) return;
+    if (typeof window === 'undefined' || typeof window.print !== 'function') return;
+    printedRef.current = true;
+    // Wait for the print DOM to render before opening the dialog.
+    const id = requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+    return () => cancelAnimationFrame(id);
+  }, [printMode]);
 
   const doExport = useCallback(
     async (format: 'docx' | 'xlsx') => {
@@ -480,7 +494,6 @@ export function ExportsPage() {
           </div>
 
           {exportErr && <div className="state state--error">{t.exportsPage.exportError}</div>}
-          {pdfErr && <div className="state state--error">{t.exportsPage.printError}</div>}
           {savedName && <div className="state state--success">{t.exportsPage.saved(savedName)}</div>}
           {emptyData && <div className="state state--warning">{t.exportsPage.emptyDataWarning}</div>}
           <p className="muted">{t.exportsPage.printHint}</p>
@@ -494,6 +507,25 @@ export function ExportsPage() {
           </article>
         </>
       ) : null}
+
+      {printMode && model && (
+        <div className="print-overlay" role="dialog" aria-label={t.exportsPage.printPreviewTitle}>
+          <div className="print-toolbar no-print">
+            <div className="print-toolbar__actions">
+              <button type="button" className="btn btn--primary" onClick={() => window.print()}>
+                {t.exportsPage.printNow}
+              </button>
+              <button type="button" className="btn" onClick={closePrint}>
+                {t.exportsPage.printBack}
+              </button>
+            </div>
+            <p className="print-toolbar__hint">{t.exportsPage.printFallback}</p>
+          </div>
+          <div className="print-document">
+            <ExportPreview model={model} />
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -354,9 +354,13 @@ const vi = {
     emptyListHint:
       'Tuần này chưa có nhận xét/tin nhắn nào được lưu. Hãy tạo và lưu ở màn hình tương ứng trước, rồi quay lại đây để xuất.',
     exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
-    printError: 'Không mở được hộp thoại in tự động. Vui lòng dùng Cmd+P/Ctrl+P hoặc xuất DOCX để in.',
     saved: (name: string) => `Đã lưu tệp: ${name}`,
     printHint: 'PDF sử dụng hộp thoại in của hệ thống. Chọn “Lưu thành PDF” trong hộp thoại in.',
+    printPreviewTitle: 'Bản in (Lưu thành PDF)',
+    printNow: 'In ngay',
+    printBack: 'Quay lại',
+    printFallback:
+      'Nếu hộp thoại in không tự mở, nhấn Cmd+P trên macOS hoặc Ctrl+P trên Windows/Linux, sau đó chọn “Lưu thành PDF”.',
     emptyDataWarning: 'Kỳ này chưa có ghi nhận nào. Tệp xuất sẽ chỉ chứa khung mẫu — hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
   },
 
@@ -738,9 +742,13 @@ const en: DeepPartial<Dict> = {
     emptyListHint:
       'No comments/messages saved for this week yet. Please create and save them on the matching screen first, then come back here to export.',
     exportError: 'Could not export the file. Please try again in the desktop app.',
-    printError: 'Could not open the print dialog automatically. Please use Cmd+P/Ctrl+P or export DOCX for printing.',
     saved: (name: string) => `File saved: ${name}`,
     printHint: 'PDF uses the system print dialog. Choose “Save as PDF” in the print dialog.',
+    printPreviewTitle: 'Print view (Save as PDF)',
+    printNow: 'Print now',
+    printBack: 'Back',
+    printFallback:
+      'If the print dialog does not open automatically, press Cmd+P on macOS or Ctrl+P on Windows/Linux, then choose “Save as PDF”.',
     emptyDataWarning: 'This period has no records yet. The exported file will contain only a template — record on the “Weekly records” screen first.',
   },
 

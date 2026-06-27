@@ -45,6 +45,7 @@ export function AppShell() {
         <div className="shell__brand">
           <span className="shell__brand-title">{t.appTitle}</span>
           <span className="shell__brand-subtitle">{t.appSubtitle}</span>
+          <span className="shell__copyright">{t.copyright}</span>
         </div>
         <div className="shell__lang">
           <label className="shell__lang-label" htmlFor="shell-lang">
@@ -79,7 +80,6 @@ export function AppShell() {
           <span className="shell__offline-dot" aria-hidden="true" />
           {t.offline}
         </div>
-        <div className="shell__copyright">{t.copyright}</div>
       </aside>
       <main className="shell__content">
         <AppNavProvider value={{ activeId, navigate: setActiveId, locale, setLocale: changeLocale }}>

@@ -90,7 +90,7 @@ For **each** artifact (Biên bản · Báo cáo tuần · Báo cáo tháng · Da
 - [ ] On **Xuất file**, click **Tải DOCX** → a **native Save dialog** opens → save → success line "Đã lưu tệp: …"; the `.docx` opens in Word/LibreOffice with diacritics intact.
 - [ ] **Tải XLSX** → native Save dialog → the `.xlsx` opens in Excel/Calc with correct headers + rows.
 - [ ] **Cancel** the Save dialog → no red error and no file written.
-- [ ] **In / Lưu PDF** → system print dialog → **Save as PDF** → readable PDF; the help line under the buttons explains this is print-based.
+- [ ] **In / Lưu PDF** → a **print preview** opens in the app (only the document, no sidebar) and the **system print dialog** opens automatically → **Save as PDF** → readable PDF. If it does not auto-open, **In ngay** (or Cmd+P / Ctrl+P per the fallback line) works; **Quay lại** returns to the page.
 - [ ] On **Nhập từ Excel**, the **"Định dạng file Excel"** card shows required (`Mã học sinh`, `Họ và tên`) and optional (`Giới tính`, `Ngày sinh`, `Ghi chú`) columns + rules.
 - [ ] **Tải file Excel mẫu** saves a template `.xlsx`; re-importing it adds the 3 sample students (a second import skips them as duplicates).
 - [ ] Copyright **"© Triền Trần - Trường THCS Lê Mao"** is visible in the sidebar footer in both Vietnamese and English; the offline/local status stays visible.
