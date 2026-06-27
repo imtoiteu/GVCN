@@ -106,6 +106,7 @@ export function ExportsPage() {
   const [emptyData, setEmptyData] = useState(false);
   const [busy, setBusy] = useState(false);
   const [exportErr, setExportErr] = useState(false);
+  const [pdfErr, setPdfErr] = useState(false);
   const [savedName, setSavedName] = useState<string | null>(null);
 
   const className = classes.find((c) => c.id === classId)?.name ?? '';
@@ -124,6 +125,7 @@ export function ExportsPage() {
       setEmptyList(false);
       setEmptyData(false);
       setExportErr(false);
+      setPdfErr(false);
       setSavedName(null);
 
       if (p.artifact === 'monthlyReport') {
@@ -280,17 +282,25 @@ export function ExportsPage() {
     [classId, className, artifact, weekId, monthKey, time, weeks, months, rebuild],
   );
 
+  // PDF is print-based (system print dialog → "Save as PDF"); it never uses the binary
+  // save/download path, and a print failure shows a PDF-specific message — not the DOCX/XLSX error.
+  const doPrintPdf = useCallback(() => {
+    if (!model) return;
+    setPdfErr(false);
+    try {
+      openPrintHtml(modelToPrintHtml(model));
+    } catch {
+      setPdfErr(true);
+    }
+  }, [model]);
+
   const doExport = useCallback(
-    async (format: 'docx' | 'xlsx' | 'pdf') => {
+    async (format: 'docx' | 'xlsx') => {
       if (!model) return;
       setBusy(true);
       setExportErr(false);
       setSavedName(null);
       try {
-        if (format === 'pdf') {
-          openPrintHtml(modelToPrintHtml(model));
-          return;
-        }
         const filename = `${model.filenameBase}.${format}`;
         const mime = format === 'docx' ? DOCX_MIME : XLSX_MIME;
         const bytes = format === 'docx' ? modelToDocx(model) : await modelToXlsx(model);
@@ -464,12 +474,13 @@ export function ExportsPage() {
             <button type="button" className="btn" disabled={busy} onClick={() => void doExport('xlsx')}>
               {busy ? t.exportsPage.exporting : t.exportsPage.downloadXlsx}
             </button>
-            <button type="button" className="btn" disabled={busy} onClick={() => void doExport('pdf')}>
+            <button type="button" className="btn" disabled={busy} onClick={doPrintPdf}>
               {t.exportsPage.printPdf}
             </button>
           </div>
 
           {exportErr && <div className="state state--error">{t.exportsPage.exportError}</div>}
+          {pdfErr && <div className="state state--error">{t.exportsPage.printError}</div>}
           {savedName && <div className="state state--success">{t.exportsPage.saved(savedName)}</div>}
           {emptyData && <div className="state state--warning">{t.exportsPage.emptyDataWarning}</div>}
           <p className="muted">{t.exportsPage.printHint}</p>

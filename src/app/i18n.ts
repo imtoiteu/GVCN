@@ -354,8 +354,9 @@ const vi = {
     emptyListHint:
       'Tuần này chưa có nhận xét/tin nhắn nào được lưu. Hãy tạo và lưu ở màn hình tương ứng trước, rồi quay lại đây để xuất.',
     exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
+    printError: 'Không mở được hộp thoại in tự động. Vui lòng dùng Cmd+P/Ctrl+P hoặc xuất DOCX để in.',
     saved: (name: string) => `Đã lưu tệp: ${name}`,
-    printHint: 'In / Lưu PDF sẽ mở hộp thoại in của hệ thống — chọn “Lưu thành PDF (Save as PDF)” để xuất tệp PDF.',
+    printHint: 'PDF sử dụng hộp thoại in của hệ thống. Chọn “Lưu thành PDF” trong hộp thoại in.',
     emptyDataWarning: 'Kỳ này chưa có ghi nhận nào. Tệp xuất sẽ chỉ chứa khung mẫu — hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
   },
 
@@ -737,8 +738,9 @@ const en: DeepPartial<Dict> = {
     emptyListHint:
       'No comments/messages saved for this week yet. Please create and save them on the matching screen first, then come back here to export.',
     exportError: 'Could not export the file. Please try again in the desktop app.',
+    printError: 'Could not open the print dialog automatically. Please use Cmd+P/Ctrl+P or export DOCX for printing.',
     saved: (name: string) => `File saved: ${name}`,
-    printHint: 'Print / Save PDF opens the system print dialog — choose “Save as PDF” to export a PDF file.',
+    printHint: 'PDF uses the system print dialog. Choose “Save as PDF” in the print dialog.',
     emptyDataWarning: 'This period has no records yet. The exported file will contain only a template — record on the “Weekly records” screen first.',
   },
 

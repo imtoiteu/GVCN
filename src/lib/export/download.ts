@@ -7,8 +7,9 @@
 //     (@tauri-apps/plugin-dialog) and write the chosen path with a tiny Rust command
 //     (`write_file_bytes`, see src-tauri/src/lib.rs). No fs-plugin scope to misconfigure.
 //   • In a plain browser (dev server / no Tauri) we keep the Blob + <a download> fallback.
-// PDF stays a print-to-PDF flow (openPrintHtml). Kept tiny and guarded so importing this module
-// never touches the DOM or Tauri at load time (the Tauri bits are dynamically imported on use).
+// PDF stays a print-to-PDF flow (openPrintHtml) — a hidden iframe + window.print(), never a
+// popup, so it works inside WKWebView. Kept tiny and guarded so importing this module never
+// touches the DOM or Tauri at load time (the Tauri bits are dynamically imported on use).
 
 /** True when a DOM is available (Tauri webview or browser), false in headless/Node. */
 function hasDom(): boolean {
@@ -78,14 +79,38 @@ export function downloadBytes(filename: string, mimeType: string, data: Uint8Arr
   }
 }
 
-/** Open a print-ready HTML document in a new window (which auto-opens the print dialog). */
+/**
+ * Print a self-contained HTML document via a hidden iframe, then let the user "Save as PDF"
+ * in the system print dialog. We deliberately do NOT use window.open('_blank'): the macOS
+ * Tauri webview (WKWebView) blocks popups, so it returned null and the PDF button surfaced a
+ * generic export error. An in-document iframe prints reliably in the webview and the browser.
+ * Throws (PDF-specific) only when there is no DOM/print available, so the caller can show a
+ * PDF-specific message instead of the DOCX/XLSX export error.
+ */
 export function openPrintHtml(html: string): void {
-  if (!hasDom() || typeof window === 'undefined') {
+  if (!hasDom() || typeof window === 'undefined' || typeof window.print !== 'function') {
     throw new Error('In/Lưu PDF chỉ hoạt động trong ứng dụng (cần trình duyệt/webview).');
   }
-  const win = window.open('', '_blank');
-  if (!win) throw new Error('Không mở được cửa sổ in. Hãy cho phép cửa sổ bật lên rồi thử lại.');
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  // Keep it out of the way and invisible; it only exists to host the print document.
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  iframe.srcdoc = html;
+  iframe.onload = () => {
+    const frameWin = iframe.contentWindow;
+    if (!frameWin) {
+      iframe.remove();
+      return;
+    }
+    frameWin.focus();
+    frameWin.print();
+    // Remove after the print dialog has had time to read the document.
+    setTimeout(() => iframe.remove(), 1000);
+  };
+  document.body.appendChild(iframe);
 }
