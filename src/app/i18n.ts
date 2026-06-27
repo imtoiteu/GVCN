@@ -26,6 +26,7 @@ const vi = {
   appTitle: 'GVCN AutoReport',
   appSubtitle: 'Trợ lý chủ nhiệm lớp',
   offline: 'Ngoại tuyến • dữ liệu lưu trên máy',
+  copyright: '© Triền Trần - Trường THCS Lê Mao',
 
   lang: {
     label: 'Ngôn ngữ',
@@ -192,6 +193,24 @@ const vi = {
     colField: 'Cột',
     colMessage: 'Lỗi',
     readError: 'Không đọc được tệp Excel.',
+    format: {
+      title: 'Định dạng file Excel',
+      requiredTitle: 'Cột bắt buộc',
+      optionalTitle: 'Cột tùy chọn',
+      colCode: 'Mã học sinh',
+      colName: 'Họ và tên',
+      colGender: 'Giới tính',
+      colDob: 'Ngày sinh',
+      colNote: 'Ghi chú',
+      ruleXlsx: 'Tệp phải có định dạng .xlsx (Excel).',
+      ruleHeader: 'Dòng đầu tiên phải là tên các cột (tiêu đề).',
+      ruleSheet: 'Dữ liệu nằm ở trang tính (sheet) đầu tiên.',
+      ruleUnique: '“Mã học sinh” phải là duy nhất trong lớp được chọn.',
+      download: 'Tải file Excel mẫu',
+      downloading: 'Đang tạo…',
+      saved: 'Đã lưu file mẫu.',
+      error: 'Không tạo được file mẫu.',
+    },
   },
 
   weekly: {
@@ -335,6 +354,8 @@ const vi = {
     emptyListHint:
       'Tuần này chưa có nhận xét/tin nhắn nào được lưu. Hãy tạo và lưu ở màn hình tương ứng trước, rồi quay lại đây để xuất.',
     exportError: 'Không xuất được tệp. Vui lòng thử lại trong ứng dụng desktop.',
+    saved: (name: string) => `Đã lưu tệp: ${name}`,
+    printHint: 'In / Lưu PDF sẽ mở hộp thoại in của hệ thống — chọn “Lưu thành PDF (Save as PDF)” để xuất tệp PDF.',
     emptyDataWarning: 'Kỳ này chưa có ghi nhận nào. Tệp xuất sẽ chỉ chứa khung mẫu — hãy ghi nhận ở màn hình “Ghi nhận tuần” trước.',
   },
 
@@ -555,6 +576,24 @@ const en: DeepPartial<Dict> = {
     colField: 'Column',
     colMessage: 'Error',
     readError: 'Could not read the Excel file.',
+    format: {
+      title: 'Excel file format',
+      requiredTitle: 'Required columns',
+      optionalTitle: 'Optional columns',
+      colCode: 'Student code',
+      colName: 'Full name',
+      colGender: 'Gender',
+      colDob: 'Date of birth',
+      colNote: 'Note',
+      ruleXlsx: 'The file must be .xlsx (Excel).',
+      ruleHeader: 'The first row must contain the column headers.',
+      ruleSheet: 'Data must be in the first worksheet.',
+      ruleUnique: '“Student code” must be unique within the selected class.',
+      download: 'Download Excel template',
+      downloading: 'Generating…',
+      saved: 'Template saved.',
+      error: 'Could not generate the template.',
+    },
   },
 
   weekly: {
@@ -698,6 +737,8 @@ const en: DeepPartial<Dict> = {
     emptyListHint:
       'No comments/messages saved for this week yet. Please create and save them on the matching screen first, then come back here to export.',
     exportError: 'Could not export the file. Please try again in the desktop app.',
+    saved: (name: string) => `File saved: ${name}`,
+    printHint: 'Print / Save PDF opens the system print dialog — choose “Save as PDF” to export a PDF file.',
     emptyDataWarning: 'This period has no records yet. The exported file will contain only a template — record on the “Weekly records” screen first.',
   },
 

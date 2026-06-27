@@ -6,6 +6,8 @@
   "permissions": [
     "core:default",
     "opener:default",
+    "dialog:default",
+    "dialog:allow-save",
     "sql:default",
     "sql:allow-load",
     "sql:allow-execute",

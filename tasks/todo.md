@@ -130,6 +130,27 @@
   runtime/config/migration change). See `docs/m9-1-demo-ux-crud-polish.md`. **Remaining:** MacBook
   GUI pass (see `docs/demo-checklist.md` §11–12).
 
+### M9.2 — Export Fix + Excel Template + Copyright Polish (done)
+- [x] **Fixed DOCX/XLSX export in the Tauri desktop app.** Root cause: the Blob + `<a download>`
+  save is ignored by macOS WKWebView, so the click did nothing and surfaced the red export error.
+  New runtime-aware `saveBytes` (`src/lib/export/download.ts`): desktop → native **Save dialog**
+  (`@tauri-apps/plugin-dialog`) + tiny Rust command `write_file_bytes` (`std::fs::write`, see
+  `src-tauri/src/lib.rs`); browser → existing Blob fallback. `ExportsPage` shows a clear
+  success/error message; cancel is not an error. ASCII filenames + Vietnamese content preserved.
+- [x] **PDF clarified** as a print-to-PDF flow (label "In / Lưu PDF" / "Print / Save PDF" kept) with
+  an honest help line; mechanism unchanged.
+- [x] **Excel import UX:** new `src/lib/import/template.ts` (`buildStudentTemplateWorkbook`, reuses
+  exceljs) + a **"Định dạng file Excel"** help card and **"Tải file Excel mẫu"** button on
+  `ImportPage`. Template (5 columns + 3 fake rows) round-trips back through the import engine.
+- [x] **Copyright** "© Triền Trần - Trường THCS Lê Mao" added once in the sidebar footer
+  (`t.copyright`), visible in vi + en; offline/local status kept.
+- [x] **Tauri deps/capabilities:** added `@tauri-apps/plugin-dialog` (npm) + `tauri-plugin-dialog`
+  (Cargo) + `dialog:default`/`dialog:allow-save` + the `write_file_bytes` command.
+- [x] Tests: `template.test.ts` (+1 round-trip), i18n (+1). Verify: typecheck 0 · test **148 passed**
+  · build 0 · `cargo check` 0 · `npm audit` 0. **`tauri build` not run on the VPS** — packaging +
+  the real export GUI test happen on the MacBook (`.dmg`). See
+  `docs/m9-2-export-template-copyright.md` and `docs/demo-checklist.md` §13.
+
 - [~] Empty/loading/error audit across all screens; Vietnamese copy pass; basic a11y
   - **i18n slice DONE (M8.1 session):** added **bilingual UI (Vietnamese default + English)**.
     Centralized all UI chrome into `src/app/i18n.ts` (`vi` canonical + partial `en` with deepMerge

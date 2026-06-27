@@ -11,8 +11,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { getDb } from '../../lib/db/tauri';
 import { listClasses } from '../../lib/db';
 import type { ClassRow } from '../../lib/db';
-import { commitStudentImport, importStudentsFromWorkbook } from '../../lib/import';
+import {
+  buildStudentTemplateWorkbook,
+  commitStudentImport,
+  importStudentsFromWorkbook,
+  TEMPLATE_FILENAME,
+} from '../../lib/import';
 import type { CommitResult, StudentImportResult } from '../../lib/import';
+import { saveBytes, XLSX_MIME } from '../../lib/export';
 import { genderLabel, t } from '../../app/i18n';
 
 type Phase = 'idle' | 'parsing' | 'parsed' | 'committing' | 'committed';
@@ -25,6 +31,8 @@ export function ImportPage() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [result, setResult] = useState<StudentImportResult | null>(null);
   const [committed, setCommitted] = useState<CommitResult | null>(null);
+  const [templateBusy, setTemplateBusy] = useState(false);
+  const [templateNotice, setTemplateNotice] = useState<'saved' | 'error' | null>(null);
 
   const loadClasses = useCallback(async () => {
     try {
@@ -55,6 +63,20 @@ export function ImportPage() {
       // A non-.xlsx or corrupt file lands here; surface as a parse failure.
       setResult({ valid: [], errors: [{ row: 0, code: 'missing_column', message: t.importPage.readError }], totalRows: 0 });
       setPhase('parsed');
+    }
+  }, []);
+
+  const downloadTemplate = useCallback(async () => {
+    setTemplateBusy(true);
+    setTemplateNotice(null);
+    try {
+      const bytes = await buildStudentTemplateWorkbook();
+      const outcome = await saveBytes(TEMPLATE_FILENAME, XLSX_MIME, bytes);
+      if (outcome === 'saved') setTemplateNotice('saved');
+    } catch {
+      setTemplateNotice('error');
+    } finally {
+      setTemplateBusy(false);
     }
   }, []);
 
@@ -102,6 +124,44 @@ export function ImportPage() {
     <section className="page">
       <h1 className="page__title">{t.importPage.title}</h1>
       <p className="muted">{t.importPage.intro}</p>
+
+      <section className="help-card">
+        <h2 className="help-card__title">{t.importPage.format.title}</h2>
+        <div className="help-card__cols">
+          <div>
+            <h3 className="help-card__subtitle">{t.importPage.format.requiredTitle}</h3>
+            <ul className="help-card__list">
+              <li><code>{t.importPage.format.colCode}</code></li>
+              <li><code>{t.importPage.format.colName}</code></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="help-card__subtitle">{t.importPage.format.optionalTitle}</h3>
+            <ul className="help-card__list">
+              <li><code>{t.importPage.format.colGender}</code></li>
+              <li><code>{t.importPage.format.colDob}</code></li>
+              <li><code>{t.importPage.format.colNote}</code></li>
+            </ul>
+          </div>
+        </div>
+        <ul className="help-card__rules">
+          <li>{t.importPage.format.ruleXlsx}</li>
+          <li>{t.importPage.format.ruleHeader}</li>
+          <li>{t.importPage.format.ruleSheet}</li>
+          <li>{t.importPage.format.ruleUnique}</li>
+        </ul>
+        <div className="toolbar toolbar--tight">
+          <button type="button" className="btn" disabled={templateBusy} onClick={() => void downloadTemplate()}>
+            {templateBusy ? t.importPage.format.downloading : t.importPage.format.download}
+          </button>
+          {templateNotice === 'saved' && (
+            <span className="help-card__notice">{t.importPage.format.saved}</span>
+          )}
+          {templateNotice === 'error' && (
+            <span className="help-card__notice help-card__notice--error">{t.importPage.format.error}</span>
+          )}
+        </div>
+      </section>
 
       <div className="toolbar">
         <label className="field">

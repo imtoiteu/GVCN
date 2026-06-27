@@ -28,7 +28,7 @@ import {
   asciiSlug,
   DOCX_MIME,
   XLSX_MIME,
-  downloadBytes,
+  saveBytes,
   modelToDocx,
   modelToPrintHtml,
   modelToXlsx,
@@ -106,6 +106,7 @@ export function ExportsPage() {
   const [emptyData, setEmptyData] = useState(false);
   const [busy, setBusy] = useState(false);
   const [exportErr, setExportErr] = useState(false);
+  const [savedName, setSavedName] = useState<string | null>(null);
 
   const className = classes.find((c) => c.id === classId)?.name ?? '';
 
@@ -123,6 +124,7 @@ export function ExportsPage() {
       setEmptyList(false);
       setEmptyData(false);
       setExportErr(false);
+      setSavedName(null);
 
       if (p.artifact === 'monthlyReport') {
         if (!p.monthGroup) {
@@ -283,14 +285,17 @@ export function ExportsPage() {
       if (!model) return;
       setBusy(true);
       setExportErr(false);
+      setSavedName(null);
       try {
-        if (format === 'docx') {
-          downloadBytes(`${model.filenameBase}.docx`, DOCX_MIME, modelToDocx(model));
-        } else if (format === 'xlsx') {
-          downloadBytes(`${model.filenameBase}.xlsx`, XLSX_MIME, await modelToXlsx(model));
-        } else {
+        if (format === 'pdf') {
           openPrintHtml(modelToPrintHtml(model));
+          return;
         }
+        const filename = `${model.filenameBase}.${format}`;
+        const mime = format === 'docx' ? DOCX_MIME : XLSX_MIME;
+        const bytes = format === 'docx' ? modelToDocx(model) : await modelToXlsx(model);
+        const outcome = await saveBytes(filename, mime, bytes);
+        if (outcome === 'saved') setSavedName(filename);
       } catch {
         setExportErr(true);
       } finally {
@@ -465,7 +470,9 @@ export function ExportsPage() {
           </div>
 
           {exportErr && <div className="state state--error">{t.exportsPage.exportError}</div>}
+          {savedName && <div className="state state--success">{t.exportsPage.saved(savedName)}</div>}
           {emptyData && <div className="state state--warning">{t.exportsPage.emptyDataWarning}</div>}
+          <p className="muted">{t.exportsPage.printHint}</p>
           {isList(artifact) && <p className="muted">{t.exportsPage.listFromSaved}</p>}
 
           <article className="student-card">

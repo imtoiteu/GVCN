@@ -85,6 +85,24 @@ describe('M9.1 dashboard / settings / CRUD keys exist in both locales', () => {
   });
 });
 
+describe('M9.2 export-save / Excel-format / copyright keys', () => {
+  it('has non-empty strings in both locales', () => {
+    for (const loc of ['vi', 'en'] as const) {
+      setLocale(loc);
+      // export save feedback + PDF hint
+      expect(t.exportsPage.saved('a.docx')).toContain('a.docx');
+      expect(t.exportsPage.printHint.length).toBeGreaterThan(0);
+      // Excel-format help block
+      expect(t.importPage.format.title.length).toBeGreaterThan(0);
+      expect(t.importPage.format.colCode.length).toBeGreaterThan(0);
+      expect(t.importPage.format.ruleUnique.length).toBeGreaterThan(0);
+      expect(t.importPage.format.download.length).toBeGreaterThan(0);
+      // copyright (proper name; same in both, vi value via fallback in en)
+      expect(t.copyright).toBe('© Triền Trần - Trường THCS Lê Mao');
+    }
+  });
+});
+
 describe('safe fallback', () => {
   it('falls back to Vietnamese for keys missing in English', () => {
     setLocale('en');

@@ -133,6 +133,13 @@ body {
   background: #34d399;
 }
 
+.shell__copyright {
+  padding: 6px 8px 2px;
+  font-size: 11px;
+  line-height: 1.4;
+  opacity: 0.6;
+}
+
 /* --- content --- */
 .shell__content {
   padding: 28px 32px;
@@ -593,4 +600,60 @@ body {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+/* --- M9.2: Excel-format help card --- */
+.help-card {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin: 12px 0 20px;
+}
+
+.help-card__title {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.help-card__cols {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.help-card__subtitle {
+  font-size: 13px;
+  margin: 0 0 4px;
+  color: #475569;
+}
+
+.help-card__list,
+.help-card__rules {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.help-card__rules {
+  margin-top: 6px;
+  color: #475569;
+}
+
+.help-card__list code {
+  background: #e2e8f0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.help-card__notice {
+  font-size: 13px;
+  color: #047857;
+  align-self: center;
+}
+
+.help-card__notice--error {
+  color: #b91c1c;
 }

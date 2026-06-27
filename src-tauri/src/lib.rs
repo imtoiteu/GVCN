@@ -4,6 +4,17 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+/// Write raw bytes to an absolute path the user already chose via the native save dialog.
+///
+/// Used by the export feature: the frontend builds the DOCX/XLSX bytes, the dialog plugin
+/// returns a destination path, and this command writes the file. Using a tiny std::fs command
+/// (instead of the fs plugin) keeps the save reliable in the macOS WKWebView without any fs
+/// scope configuration — the path is one the user explicitly picked, never attacker-controlled.
+#[tauri::command]
+fn write_file_bytes(path: String, contents: Vec<u8>) -> Result<(), String> {
+    std::fs::write(&path, &contents).map_err(|e| e.to_string())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     use tauri_plugin_sql::{Migration, MigrationKind};
@@ -28,12 +39,13 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations("sqlite:gvcn.db", migrations)
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![greet])
+        .invoke_handler(tauri::generate_handler![greet, write_file_bytes])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
